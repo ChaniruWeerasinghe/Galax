@@ -646,7 +646,7 @@ export default function GalleryPage() {
             ) : (
               <img
                 key={lightboxItem.id}
-                src={lightboxItem.url || lightboxItem.thumbnail}
+                src={lightboxItem.thumbnail ? lightboxItem.thumbnail.replace(/=s\d+/, '=s1600') : lightboxItem.thumbnail}
                 alt={lightboxItem.name}
                 referrerPolicy="no-referrer"
                 style={{
