@@ -19,31 +19,31 @@ export default function GalleryPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const galleryId = params.id as string;
-  
+
   const [gallery, setGallery] = useState<Gallery | null>(null);
   const [activeTab, setActiveTab] = useState<EventTab | null>(null);
   const [theme, setTheme] = useState("light");
-  
+
   // Media Quality State
   const [mediaQuality, setMediaQuality] = useState<"standard" | "high" | "original">("high");
   const [showQualityMenu, setShowQualityMenu] = useState(false);
-  
+
   // Google Drive State
   const [driveLink, setDriveLink] = useState("");
   const [media, setMedia] = useState<GalleryMedia[]>([]);
   const [isDriveLoading, setIsDriveLoading] = useState(false);
   const [zipProgress, setZipProgress] = useState("");
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
-  
+
   // Auth State
   const [user, setUser] = useState<User | null>(null);
-  
+
   // Derived state for admin check to avoid stale closures and infinite effect loops
   const isAdmin = user && gallery ? user.uid === gallery.userId : false;
-  
+
   const [newTabName, setNewTabName] = useState("");
   const [error, setError] = useState("");
-  
+
   // Custom Overlays State
   const [toastMessage, setToastMessage] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -115,9 +115,9 @@ export default function GalleryPage() {
         router.push("/");
         return;
       }
-      
+
       setGallery(data);
-      
+
       // If no active tab is set, or if the active tab was deleted, default to first tab
       if (data.tabs && data.tabs.length > 0) {
         const urlTabId = searchParams.get("tab");
@@ -184,11 +184,11 @@ export default function GalleryPage() {
   const handleAddTab = async (e: FormEvent) => {
     e.preventDefault();
     if (!newTabName) return;
-    
+
     const newTab = await store.addTab(galleryId, newTabName, newTabDriveLink);
     setNewTabName("");
     setNewTabDriveLink("");
-    
+
     if (newTab) {
       setActiveTab(newTab);
       setDriveLink(newTab.driveLink || "");
@@ -199,7 +199,7 @@ export default function GalleryPage() {
     if (activeTab?.id === tab.id) return;
     setActiveTab(tab);
     setDriveLink(tab.driveLink || "");
-    setMedia([]); 
+    setMedia([]);
   };
 
   const confirmDeleteTab = (tabId: string) => {
@@ -239,14 +239,14 @@ export default function GalleryPage() {
     <>
       <nav className="gallery-nav" style={{ padding: '2rem 4vw', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <button 
-            onClick={() => router.push("/")} 
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              color: 'var(--text-secondary)', 
-              cursor: 'pointer', 
-              fontSize: '0.85rem', 
+          <button
+            onClick={() => router.push("/")}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
               marginBottom: '0.5rem',
               display: 'flex',
               alignItems: 'center',
@@ -267,8 +267,8 @@ export default function GalleryPage() {
         </div>
         <div className="gallery-nav-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           {/* Dark Mode Toggle */}
-          <button 
-            onClick={toggleTheme} 
+          <button
+            onClick={toggleTheme}
             title="Toggle Theme"
             style={{
               background: 'transparent',
@@ -280,7 +280,7 @@ export default function GalleryPage() {
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              borderRadius: '50%', 
+              borderRadius: '50%',
               transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
               transform: theme === 'dark' ? 'rotate(180deg)' : 'rotate(0deg)'
             }}
@@ -305,11 +305,11 @@ export default function GalleryPage() {
               </svg>
             )}
           </button>
-          
+
           {/* Quality Selector */}
           {media.length > 0 && (
             <div style={{ position: 'relative' }}>
-              <button 
+              <button
                 onClick={() => setShowQualityMenu(!showQualityMenu)}
                 title="Media Quality"
                 style={{
@@ -321,7 +321,7 @@ export default function GalleryPage() {
                   alignItems: 'center',
                   gap: '6px',
                   cursor: 'pointer',
-                  borderRadius: '24px', 
+                  borderRadius: '24px',
                   fontSize: '0.85rem',
                   transition: 'all var(--transition-fast)'
                 }}
@@ -333,35 +333,35 @@ export default function GalleryPage() {
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </button>
-              
+
               {showQualityMenu && (
-                <div style={{ 
-                  position: 'absolute', 
-                  top: '100%', 
-                  right: 0, 
-                  marginTop: '0.5rem', 
-                  background: 'var(--bg-primary)', 
-                  border: '1px solid var(--border-light)', 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  minWidth: '160px', 
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '0.5rem',
+                  background: 'var(--bg-primary)',
+                  border: '1px solid var(--border-light)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minWidth: '160px',
                   zIndex: 20,
                   boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                 }}>
-                  <button 
-                    onClick={() => { setMediaQuality('standard'); setShowQualityMenu(false); }} 
+                  <button
+                    onClick={() => { setMediaQuality('standard'); setShowQualityMenu(false); }}
                     style={{ padding: '0.75rem 1rem', background: mediaQuality === 'standard' ? 'var(--bg-secondary)' : 'none', border: 'none', borderBottom: '1px solid var(--border-light)', textAlign: 'left', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: mediaQuality === 'standard' ? '500' : '300' }}
                   >
                     Standard (Fastest)
                   </button>
-                  <button 
-                    onClick={() => { setMediaQuality('high'); setShowQualityMenu(false); }} 
+                  <button
+                    onClick={() => { setMediaQuality('high'); setShowQualityMenu(false); }}
                     style={{ padding: '0.75rem 1rem', background: mediaQuality === 'high' ? 'var(--bg-secondary)' : 'none', border: 'none', borderBottom: '1px solid var(--border-light)', textAlign: 'left', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: mediaQuality === 'high' ? '500' : '300' }}
                   >
                     High Quality
                   </button>
-                  <button 
-                    onClick={() => { setMediaQuality('original'); setShowQualityMenu(false); }} 
+                  <button
+                    onClick={() => { setMediaQuality('original'); setShowQualityMenu(false); }}
                     style={{ padding: '0.75rem 1rem', background: mediaQuality === 'original' ? 'var(--bg-secondary)' : 'none', border: 'none', textAlign: 'left', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: mediaQuality === 'original' ? '500' : '300' }}
                   >
                     Original (Max Res)
@@ -373,14 +373,14 @@ export default function GalleryPage() {
 
           {gallery.tabs.length > 0 && (
             <div style={{ position: 'relative' }}>
-              <button 
+              <button
                 onClick={() => setShowDownloadMenu(!showDownloadMenu)}
-                style={{ 
-                  background: 'transparent', 
-                  color: 'var(--text-primary)', 
-                  border: '1px solid var(--border-light)', 
-                  padding: '0.5rem 1rem', 
-                  fontSize: '0.85rem', 
+                style={{
+                  background: 'transparent',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-light)',
+                  padding: '0.5rem 1rem',
+                  fontSize: '0.85rem',
                   cursor: 'pointer',
                   borderRadius: '24px',
                   display: 'flex',
@@ -399,27 +399,27 @@ export default function GalleryPage() {
                 </svg>
               </button>
               {showDownloadMenu && (
-                <div style={{ 
-                  position: 'absolute', 
-                  top: '100%', 
-                  right: 0, 
-                  marginTop: '0.5rem', 
-                  background: 'var(--bg-primary)', 
-                  border: '1px solid var(--border-light)', 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  minWidth: '220px', 
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '0.5rem',
+                  background: 'var(--bg-primary)',
+                  border: '1px solid var(--border-light)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minWidth: '220px',
                   zIndex: 10,
                   boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                 }}>
-                  <button 
-                    onClick={async () => { setShowDownloadMenu(false); if (activeTab) await downloadTabAsZip(activeTab, media, setZipProgress); }} 
+                  <button
+                    onClick={async () => { setShowDownloadMenu(false); if (activeTab) await downloadTabAsZip(activeTab, media, setZipProgress); }}
                     style={{ padding: '0.75rem 1rem', background: 'none', border: 'none', borderBottom: '1px solid var(--border-light)', textAlign: 'left', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '0.85rem' }}
                   >
                     Download Current Tab
                   </button>
-                  <button 
-                    onClick={async () => { setShowDownloadMenu(false); await downloadGalleryAsZip(gallery, setZipProgress); }} 
+                  <button
+                    onClick={async () => { setShowDownloadMenu(false); await downloadGalleryAsZip(gallery, setZipProgress); }}
                     style={{ padding: '0.75rem 1rem', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '0.85rem' }}
                   >
                     Download Entire Gallery (.zip)
@@ -428,17 +428,17 @@ export default function GalleryPage() {
               )}
             </div>
           )}
-          <button 
+          <button
             onClick={() => {
               navigator.clipboard.writeText(window.location.href);
               showToast("Gallery link copied to clipboard!");
             }}
-            style={{ 
-              background: 'var(--text-primary)', 
-              color: 'var(--bg-primary)', 
-              border: 'none', 
-              padding: '0.5rem 1rem', 
-              fontSize: '0.85rem', 
+            style={{
+              background: 'var(--text-primary)',
+              color: 'var(--bg-primary)',
+              border: 'none',
+              padding: '0.5rem 1rem',
+              fontSize: '0.85rem',
               cursor: 'pointer',
               borderRadius: '0'
             }}
@@ -462,9 +462,9 @@ export default function GalleryPage() {
             <div className="admin-controls-panel" style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
               <div style={{ flex: '1 1 100%' }}>
                 <form onSubmit={handleAddTab} className="admin-form" style={{ display: 'flex', gap: '0.5rem' }}>
-                  <input 
-                    type="text" 
-                    placeholder="Tab Name (e.g. Weddings)" 
+                  <input
+                    type="text"
+                    placeholder="Tab Name (e.g. Weddings)"
                     value={newTabName}
                     onChange={(e) => setNewTabName(e.target.value)}
                     required
@@ -478,9 +478,9 @@ export default function GalleryPage() {
                       fontSize: '0.85rem'
                     }}
                   />
-                  <input 
-                    type="url" 
-                    placeholder="Paste Google Drive Folder Link" 
+                  <input
+                    type="url"
+                    placeholder="Paste Google Drive Folder Link"
                     value={newTabDriveLink}
                     onChange={(e) => setNewTabDriveLink(e.target.value)}
                     required
@@ -499,11 +499,11 @@ export default function GalleryPage() {
                   </button>
                 </form>
               </div>
-              
+
               {/* Delete Active Tab Button */}
               {activeTab && (
                 <div style={{ flex: '1 1 100%', display: 'flex', justifyContent: 'flex-end', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
-                  <button 
+                  <button
                     onClick={() => confirmDeleteTab(activeTab.id)}
                     style={{
                       background: 'transparent',
@@ -524,14 +524,14 @@ export default function GalleryPage() {
             </div>
           </div>
         )}
-        
+
         {error && <p style={{ color: '#e53935', marginBottom: '2rem' }}>{error}</p>}
-        
+
         {/* Media Counts & Quick Actions */}
         {media.length > 0 && !isDriveLoading && (
-          <div style={{ 
-            marginBottom: '1rem', 
-            fontSize: '0.9rem', 
+          <div style={{
+            marginBottom: '1rem',
+            fontSize: '0.9rem',
             color: 'var(--text-secondary)',
             display: 'flex',
             alignItems: 'center',
@@ -544,9 +544,9 @@ export default function GalleryPage() {
               <span>•</span>
               <span>{media.filter(m => m.isVideo).length} Videos</span>
             </div>
-            
+
             {activeTab && (
-              <button 
+              <button
                 onClick={async () => { if (activeTab) await downloadTabAsZip(activeTab, media, setZipProgress); }}
                 style={{
                   background: 'transparent',
@@ -575,10 +575,10 @@ export default function GalleryPage() {
           </div>
         )}
 
-        <div className="gallery-media-grid" style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
-          gridAutoRows: '200px', 
+        <div className="gallery-media-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+          gridAutoRows: '200px',
           gap: '16px',
           gridAutoFlow: 'dense',
           paddingBottom: '8rem'
@@ -592,9 +592,9 @@ export default function GalleryPage() {
               else if (index % 5 === 0) { colSpan = 2; rowSpan = 1; }
               else if (index % 3 === 0) { colSpan = 1; rowSpan = 2; }
               return (
-                <div 
-                  key={`skeleton-${index}`} 
-                  className="skeleton masonry-item" 
+                <div
+                  key={`skeleton-${index}`}
+                  className="skeleton masonry-item"
                   style={{
                     gridColumn: `span ${colSpan}`,
                     gridRow: `span ${rowSpan}`,
@@ -621,8 +621,8 @@ export default function GalleryPage() {
             }
 
             return (
-              <div 
-                className="masonry-item" 
+              <div
+                className="masonry-item"
                 key={item.id}
                 onClick={(e) => {
                   if ((e.target as Element).closest('button') || (e.target as Element).closest('a')) return;
@@ -665,54 +665,54 @@ export default function GalleryPage() {
                     </div>
                   </div>
                 ) : (
-                  <img 
-                    src={item.thumbnail ? getQualityUrl(item.thumbnail) : item.url} 
-                    alt={item.name || "Gallery media"} 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  <img
+                    src={item.thumbnail ? getQualityUrl(item.thumbnail) : item.url}
+                    alt={item.name || "Gallery media"}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     loading="lazy"
                     referrerPolicy="no-referrer"
                   />
                 )}
-              
-              <div className="masonry-item-overlay">
-                <span style={{ fontWeight: 400, fontSize: "1.1rem", display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                  {item.name.replace(/\.[^/.]+$/, "")}
-                  <a 
-                    href={`/api/proxy?url=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${item.id}`)}&filename=${encodeURIComponent(item.name)}`}
-                    download={item.name}
-                    onClick={(e) => e.stopPropagation()}
-                    onPointerDown={(e) => e.stopPropagation()}
-                    style={{
-                      background: 'rgba(255,255,255,0.2)',
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: '44px',
-                      height: '44px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                      cursor: 'pointer',
-                      backdropFilter: 'blur(4px)',
-                      transition: 'background var(--transition-fast)',
-                      textDecoration: 'none',
-                      flexShrink: 0
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.4)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
-                    title="Download"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                      <polyline points="7 10 12 15 17 10"></polyline>
-                      <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                  </a>
-                </span>
+
+                <div className="masonry-item-overlay">
+                  <span style={{ fontWeight: 400, fontSize: "1.1rem", display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                    {item.name.replace(/\.[^/.]+$/, "")}
+                    <a
+                      href={`/api/proxy?url=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${item.id}`)}&filename=${encodeURIComponent(item.name)}`}
+                      download={item.name}
+                      onClick={(e) => e.stopPropagation()}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      style={{
+                        background: 'rgba(255,255,255,0.2)',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '32px',
+                        height: '32px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                        cursor: 'pointer',
+                        backdropFilter: 'blur(4px)',
+                        transition: 'background var(--transition-fast)',
+                        textDecoration: 'none',
+                        pointerEvents: 'auto'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.4)'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                      title="Download"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                      </svg>
+                    </a>
+                  </span>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
         </div>
       </main>
 
@@ -722,14 +722,14 @@ export default function GalleryPage() {
           <div className="floating-tabs">
             {gallery.tabs.map((tab) => (
               <div key={tab.id} style={{ display: 'inline-flex', alignItems: 'center', position: 'relative' }}>
-                <button 
+                <button
                   className={`tab-btn ${activeTab?.id === tab.id ? "active" : ""}`}
                   onClick={() => handleTabSwitch(tab)}
                   style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                 >
                   <span>{tab.name}</span>
                   {activeTab?.id === tab.id && (
-                    <span 
+                    <span
                       onClick={(e) => {
                         e.stopPropagation();
                         const url = new URL(window.location.href);
@@ -748,7 +748,7 @@ export default function GalleryPage() {
                 </button>
               </div>
             ))}
-            
+
             {/* Divider */}
           </div>
         </div>
@@ -806,7 +806,7 @@ export default function GalleryPage() {
               }}
               title="Close"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
           </div>
 
@@ -823,7 +823,7 @@ export default function GalleryPage() {
                 color: 'white', cursor: 'pointer'
               }}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
             </button>
           )}
 
@@ -840,7 +840,7 @@ export default function GalleryPage() {
                 color: 'white', cursor: 'pointer'
               }}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
             </button>
           )}
 
@@ -937,7 +937,7 @@ export default function GalleryPage() {
               Are you sure you want to permanently delete this tab? This will hide all images associated with it. This action cannot be undone.
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <button 
+              <button
                 onClick={() => { setShowDeleteConfirm(false); setTabToDelete(null); }}
                 style={{
                   background: 'transparent',
@@ -951,7 +951,7 @@ export default function GalleryPage() {
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={executeDeleteTab}
                 style={{
                   background: '#e53935',
