@@ -110,8 +110,8 @@ export default function GalleriesHome() {
               </a>
             </div>
             
-            {/* Auth Toggle */}
-            {authLoading ? null : user ? (
+            {/* Auth Toggle (Only Logout is in sidebar) */}
+            {!authLoading && user && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{user.displayName}</span>
                 <button 
@@ -130,94 +130,11 @@ export default function GalleriesHome() {
                   Logout
                 </button>
               </div>
-            ) : (
-              <button 
-                onClick={handleLogin} 
-                style={{
-                  background: '#ffffff',
-                  border: '1px solid #dadce0',
-                  color: '#3c4043',
-                  fontSize: '0.85rem',
-                  fontWeight: 500,
-                  padding: '0.5rem 1rem',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  boxShadow: '0 1px 2px 0 rgba(60,64,67,0.3)',
-                  transition: 'background-color 0.2s',
-                  marginTop: '1rem',
-                  fontFamily: 'Roboto, arial, sans-serif'
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f8f9fa'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; }}
-              >
-                <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                  <path fill="none" d="M0 0h48v48H0z"/>
-                </svg>
-                Sign in with Google
-              </button>
             )}
           </div>
 
           {/* Middle: Galleries List */}
-          <div style={{ flex: 1, overflowY: 'auto' }}>
-            
-            {!authLoading && !user && (
-              <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--text-secondary)' }}>
-                <p style={{ fontSize: '1rem', fontWeight: 300, marginBottom: '1rem' }}>Create your first gallery to get started.</p>
-                <p style={{ fontSize: '0.85rem', opacity: 0.7 }}>Sign in above to host your portfolio.</p>
-              </div>
-            )}
-
-            {/* Dark Mode Toggle (Top Right) */}
-            <button 
-              onClick={toggleTheme} 
-              title="Toggle Theme"
-              style={{
-                position: 'absolute',
-                top: '2.5rem',
-                right: '2.5rem',
-                zIndex: 100,
-                background: 'transparent',
-                border: '1px solid var(--border-light)',
-                color: 'var(--text-primary)',
-                width: '45px',
-                height: '45px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                borderRadius: '0', 
-                transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                transform: theme === 'dark' ? 'rotate(180deg)' : 'rotate(0deg)'
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--text-primary)'; e.currentTarget.style.transform = theme === 'dark' ? 'rotate(180deg) scale(1.05)' : 'rotate(0deg) scale(1.05)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-light)'; e.currentTarget.style.transform = theme === 'dark' ? 'rotate(180deg)' : 'rotate(0deg)'; }}
-            >
-              {theme === 'dark' ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
-                  <circle cx="12" cy="12" r="5"></circle>
-                  <line x1="12" y1="1" x2="12" y2="3"></line>
-                  <line x1="12" y1="21" x2="12" y2="23"></line>
-                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                  <line x1="1" y1="12" x2="3" y2="12"></line>
-                  <line x1="21" y1="12" x2="23" y2="12"></line>
-                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-              )}
-            </button>
+          <div style={{ flex: 1, overflowY: 'auto', paddingRight: '1rem' }}>
 
             {/* Create Gallery Form (Logged in Only) */}
             {user && (
@@ -339,8 +256,91 @@ export default function GalleriesHome() {
         </aside>
 
         {/* RIGHT SIDE: Dynamic Masonry Grid of Gallery Cards */}
-        <main style={{ flex: 1, padding: '2vw' }}>
-          {galleries.length === 0 ? (
+        <main style={{ flex: 1, padding: '2vw', position: 'relative' }}>
+          
+          {/* Dark Mode Toggle (Fixed Top Right) */}
+          <button 
+            onClick={toggleTheme} 
+            title="Toggle Theme"
+            style={{
+              position: 'fixed',
+              top: '2.5rem',
+              right: '2.5rem',
+              zIndex: 100,
+              background: 'transparent',
+              border: '1px solid var(--border-light)',
+              color: 'var(--text-primary)',
+              width: '45px',
+              height: '45px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              borderRadius: '0', 
+              transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+              transform: theme === 'dark' ? 'rotate(180deg)' : 'rotate(0deg)'
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--text-primary)'; e.currentTarget.style.transform = theme === 'dark' ? 'rotate(180deg) scale(1.05)' : 'rotate(0deg) scale(1.05)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-light)'; e.currentTarget.style.transform = theme === 'dark' ? 'rotate(180deg)' : 'rotate(0deg)'; }}
+          >
+            {theme === 'dark' ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            )}
+          </button>
+
+          {!authLoading && !user ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '4rem', textAlign: 'center' }}>
+              <h2 style={{ fontSize: '3.5rem', fontWeight: 300, marginBottom: '1.5rem', letterSpacing: '-1.5px', color: 'var(--text-primary)' }}>Welcome to Galax</h2>
+              <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', marginBottom: '3rem', maxWidth: '500px', lineHeight: 1.6, fontWeight: 300 }}>
+                A premium, ultra-fast portfolio manager for high-end photography studios. Sign in to host, manage, and share your galleries with clients.
+              </p>
+              
+              <button 
+                onClick={handleLogin} 
+                style={{
+                  background: '#ffffff',
+                  border: '1px solid #dadce0',
+                  color: '#3c4043',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  padding: '0.75rem 1.5rem',
+                  cursor: 'pointer',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  boxShadow: '0 1px 2px 0 rgba(60,64,67,0.3)',
+                  transition: 'background-color 0.2s',
+                  fontFamily: 'Roboto, arial, sans-serif'
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f8f9fa'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; }}
+              >
+                <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                  <path fill="none" d="M0 0h48v48H0z"/>
+                </svg>
+                Sign in with Google
+              </button>
+            </div>
+          ) : galleries.length === 0 ? (
             <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
               <p style={{ fontWeight: 300 }}>Create your first gallery on the left to get started.</p>
             </div>
