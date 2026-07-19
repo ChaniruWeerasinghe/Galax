@@ -90,22 +90,21 @@ export default function GalleriesHome() {
         
         {/* LEFT SIDEBAR (Fixed) */}
         <aside style={{
-          flex: '0 0 220px',
+          width: '300px',
           height: '100vh',
           position: 'sticky',
           top: 0,
           display: 'flex',
           flexDirection: 'column',
-          padding: '3rem 1.5rem',
+          padding: '1.5rem',
           borderRight: '1px solid var(--border-light)',
           background: 'var(--bg-primary)'
         }}>
           {/* Top: Logo & Theme Toggle */}
-          <div style={{ marginBottom: '3rem' }}>
+          <div style={{ marginBottom: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <div style={{ marginBottom: '1.5rem' }}>
               <a href="/" style={{ textDecoration: 'none', color: 'var(--text-primary)', display: 'block' }}>
                 <img src="/logo.png" alt="Galax Studios" style={{ height: '65px', width: 'auto', filter: theme === 'dark' ? 'invert(1)' : 'none', objectFit: 'contain' }} />
-                <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', marginTop: '0.5rem', letterSpacing: '1px' }}>PORTFOLIO</p>
               </a>
             </div>
             
@@ -129,7 +128,7 @@ export default function GalleriesHome() {
             
             {/* Auth Toggle */}
             {authLoading ? null : user ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginLeft: '0.5rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{user.displayName}</span>
                 <button 
                   onClick={handleLogout} 
@@ -159,7 +158,7 @@ export default function GalleriesHome() {
                   cursor: 'pointer',
                   borderRadius: '0',
                   transition: 'all var(--transition-fast)',
-                  marginLeft: '0.5rem'
+                  marginTop: '0.5rem'
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.borderColor = 'var(--text-primary)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.borderColor = 'var(--border-light)'; }}
