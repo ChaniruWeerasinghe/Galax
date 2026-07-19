@@ -315,14 +315,46 @@ export default function GalleryPage() {
         
         {error && <p style={{ color: '#e53935', marginBottom: '2rem' }}>{error}</p>}
 
-        <div className="masonry-grid">
-          {media.map((item) => (
-            <div className="masonry-item" key={item.id}>
-              {item.isVideo ? (
-                <video src={item.url} muted loop playsInline autoPlay style={{ width: '100%', display: 'block' }} />
-              ) : (
-                <img src={item.thumbnail || item.url} alt={item.name || "Gallery media"} />
-              )}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
+          gridAutoRows: '200px', 
+          gap: '16px',
+          gridAutoFlow: 'dense',
+          paddingBottom: '8rem'
+        }}>
+          {media.map((item, index) => {
+            // 5 Distinct Image Styles (Width x Height spans)
+            let colSpan = 1;
+            let rowSpan = 1;
+
+            if (index % 11 === 0) {
+              colSpan = 3; rowSpan = 2; // Style 5: Feature Panorama
+            } else if (index % 7 === 0) {
+              colSpan = 2; rowSpan = 2; // Style 4: Large Square
+            } else if (index % 5 === 0) {
+              colSpan = 2; rowSpan = 1; // Style 2: Wide Landscape
+            } else if (index % 3 === 0) {
+              colSpan = 1; rowSpan = 2; // Style 3: Tall Portrait
+            } else {
+              colSpan = 1; rowSpan = 1; // Style 1: Standard
+            }
+
+            return (
+              <div 
+                className="masonry-item" 
+                key={item.id}
+                style={{
+                  gridColumn: `span ${colSpan}`,
+                  gridRow: `span ${rowSpan}`,
+                  margin: 0 // Override masonry-item margin
+                }}
+              >
+                {item.isVideo ? (
+                  <video src={item.url} muted loop playsInline autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                ) : (
+                  <img src={item.thumbnail || item.url} alt={item.name || "Gallery media"} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                )}
               
               <div className="masonry-item-overlay">
                 <span style={{ fontWeight: 400, fontSize: "1.1rem", display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
