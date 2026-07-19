@@ -267,16 +267,16 @@ body {
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 90;
+  z-index: 500;
 }
 
 .floating-tabs {
   display: flex;
   background: var(--bg-secondary);
   padding: 0.35rem; 
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.12);
   border: 1px solid var(--border-light);
-  border-radius: 100px; /* Restored pill shape */
+  border-radius: 100px;
   gap: 0.25rem;
 }
 
@@ -430,19 +430,22 @@ body {
 
   /* Floating tab bar — scrollable pill row */
   .floating-tabs-container {
-    bottom: 1rem !important;
-    width: 95vw !important;
+    bottom: 1.25rem !important;
+    width: 92vw !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
+    z-index: 500 !important;
   }
 
   .floating-tabs {
     overflow-x: auto !important;
     justify-content: flex-start !important;
-    padding: 0.25rem !important;
+    padding: 0.3rem !important;
     border-radius: 100px !important;
     flex-wrap: nowrap !important;
     -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.14) !important;
   }
 
   .tab-btn {
