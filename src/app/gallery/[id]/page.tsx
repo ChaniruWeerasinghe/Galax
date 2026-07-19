@@ -365,32 +365,35 @@ export default function GalleryPage() {
         <div className="floating-tabs-container">
           <div className="floating-tabs">
             {gallery.tabs.map((tab) => (
-              <div key={tab.id} style={{ display: 'inline-flex', alignItems: 'center' }}>
+              <div key={tab.id} style={{ display: 'inline-flex', alignItems: 'center', position: 'relative' }}>
                 <button 
                   className={`tab-btn ${activeTab?.id === tab.id ? "active" : ""}`}
                   onClick={() => handleTabSwitch(tab)}
-                  style={isAdmin ? { paddingRight: '0.5rem' } : undefined}
+                  style={{ display: 'flex', alignItems: 'center', gap: isAdmin ? '0.5rem' : '0', paddingRight: isAdmin ? '0.75rem' : undefined }}
                 >
-                  {tab.name}
+                  <span>{tab.name}</span>
+                  
+                  {isAdmin && (
+                    <span
+                      onClick={(e) => { e.stopPropagation(); handleDeleteTab(tab.id); }}
+                      style={{ 
+                        color: activeTab?.id === tab.id ? 'rgba(255,255,255,0.7)' : 'var(--text-secondary)', 
+                        cursor: 'pointer', 
+                        fontSize: '1.2rem',
+                        lineHeight: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'color var(--transition-fast)'
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = '#e53935'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = activeTab?.id === tab.id ? 'rgba(255,255,255,0.7)' : 'var(--text-secondary)'; }}
+                      title="Delete Tab"
+                    >
+                      ×
+                    </span>
+                  )}
                 </button>
-                {isAdmin && (
-                  <button
-                    onClick={() => handleDeleteTab(tab.id)}
-                    style={{ 
-                      background: 'none', 
-                      border: 'none', 
-                      color: activeTab?.id === tab.id ? 'var(--bg-primary)' : 'var(--text-secondary)', 
-                      cursor: 'pointer', 
-                      padding: '0 0.75rem 0 0.25rem',
-                      marginRight: '0.25rem',
-                      fontSize: '1.2rem',
-                      lineHeight: 1
-                    }}
-                    title="Delete Tab"
-                  >
-                    ×
-                  </button>
-                )}
               </div>
             ))}
             

@@ -15,6 +15,7 @@ export interface Gallery {
   coverImage?: string; 
   createdAt: number;
   tabs: EventTab[];
+  icon?: string; 
 }
 
 export const store = {
@@ -63,16 +64,18 @@ export const store = {
   },
 
   // Firebase Mutations
-  createGallery: async (userId: string, name: string) => {
-    const newGallery: Gallery = {
-      id: crypto.randomUUID(),
-      userId,
+  createGallery: async (userId: string, name: string, icon: string = "Image") => {
+    const newRef = doc(collection(db, "galleries"));
+    const gallery: Gallery = {
+      id: newRef.id,
       name,
+      userId,
       createdAt: Date.now(),
-      tabs: []
+      tabs: [],
+      icon
     };
-    await setDoc(doc(db, "galleries", newGallery.id), newGallery);
-    return newGallery;
+    await setDoc(newRef, gallery);
+    return gallery;
   },
 
   deleteGallery: async (id: string) => {
