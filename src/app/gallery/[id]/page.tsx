@@ -897,7 +897,7 @@ export default function GalleryPage() {
           padding: '1rem 1.5rem',
           borderRadius: '8px',
           boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-          zIndex: 9999,
+          zIndex: 10001,
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
