@@ -287,6 +287,28 @@ export default function GalleryPage() {
                   </button>
                 </form>
               </div>
+              
+              {/* Delete Active Tab Button */}
+              {activeTab && (
+                <div style={{ flex: '1 1 100%', display: 'flex', justifyContent: 'flex-end', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
+                  <button 
+                    onClick={() => handleDeleteTab(activeTab.id)}
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid #e53935',
+                      color: '#e53935',
+                      cursor: 'pointer',
+                      fontSize: '0.85rem',
+                      padding: '0.5rem 1rem',
+                      transition: 'all var(--transition-fast)'
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = '#e53935'; e.currentTarget.style.color = 'white'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#e53935'; }}
+                  >
+                    Delete Current Tab ("{activeTab.name}")
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -369,30 +391,8 @@ export default function GalleryPage() {
                 <button 
                   className={`tab-btn ${activeTab?.id === tab.id ? "active" : ""}`}
                   onClick={() => handleTabSwitch(tab)}
-                  style={{ display: 'flex', alignItems: 'center', gap: isAdmin ? '0.5rem' : '0', paddingRight: isAdmin ? '0.75rem' : undefined }}
                 >
                   <span>{tab.name}</span>
-                  
-                  {isAdmin && (
-                    <span
-                      onClick={(e) => { e.stopPropagation(); handleDeleteTab(tab.id); }}
-                      style={{ 
-                        color: activeTab?.id === tab.id ? 'rgba(255,255,255,0.7)' : 'var(--text-secondary)', 
-                        cursor: 'pointer', 
-                        fontSize: '1.2rem',
-                        lineHeight: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        transition: 'color var(--transition-fast)'
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.color = '#e53935'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.color = activeTab?.id === tab.id ? 'rgba(255,255,255,0.7)' : 'var(--text-secondary)'; }}
-                      title="Delete Tab"
-                    >
-                      ×
-                    </span>
-                  )}
                 </button>
               </div>
             ))}
