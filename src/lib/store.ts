@@ -120,15 +120,5 @@ export const store = {
         await updateDoc(docRef, { tabs: gallery.tabs });
       }
     }
-  },
-  
-  deleteTab: async (galleryId: string, tabId: string) => {
-    const docRef = doc(db, "galleries", galleryId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const gallery = docSnap.data() as Gallery;
-      gallery.tabs = gallery.tabs.filter(t => t.id !== tabId);
-      await updateDoc(docRef, { tabs: gallery.tabs });
-    }
   }
 };
