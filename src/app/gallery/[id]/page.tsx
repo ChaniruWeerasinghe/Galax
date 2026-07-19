@@ -445,7 +445,27 @@ export default function GalleryPage() {
           gridAutoFlow: 'dense',
           paddingBottom: '8rem'
         }}>
-          {media.map((item, index) => {
+          {isDriveLoading ? (
+            Array.from({ length: 12 }).map((_, index) => {
+              let colSpan = 1;
+              let rowSpan = 1;
+              if (index % 11 === 0) { colSpan = 3; rowSpan = 2; }
+              else if (index % 7 === 0) { colSpan = 2; rowSpan = 2; }
+              else if (index % 5 === 0) { colSpan = 2; rowSpan = 1; }
+              else if (index % 3 === 0) { colSpan = 1; rowSpan = 2; }
+              return (
+                <div 
+                  key={`skeleton-${index}`} 
+                  className="skeleton masonry-item" 
+                  style={{
+                    gridColumn: `span ${colSpan}`,
+                    gridRow: `span ${rowSpan}`,
+                    margin: 0
+                  }}
+                />
+              );
+            })
+          ) : media.map((item, index) => {
             // 5 Distinct Image Styles (Width x Height spans)
             let colSpan = 1;
             let rowSpan = 1;

@@ -23,6 +23,7 @@ export default function GalleriesHome() {
   // Auth State
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [galleriesLoading, setGalleriesLoading] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowIntro(false), 1000);
@@ -38,12 +39,15 @@ export default function GalleriesHome() {
       setAuthLoading(false);
       
       if (currentUser) {
+        setGalleriesLoading(true);
         // Subscribe to ONLY this user's galleries
         unsubscribeGalleries = store.subscribeToGalleries(currentUser.uid, (data) => {
           setGalleries(data);
+          setGalleriesLoading(false);
         });
       } else {
         setGalleries([]);
+        setGalleriesLoading(false);
       }
     });
 
@@ -430,6 +434,31 @@ export default function GalleriesHome() {
                 </svg>
                 Sign in with Google
               </button>
+            </div>
+          ) : (authLoading || galleriesLoading) && user ? (
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', 
+              gridAutoRows: '180px', 
+              gap: '12px',
+              gridAutoFlow: 'dense'
+            }}>
+              {Array.from({ length: 8 }).map((_, index) => {
+                const isWide = index % 3 === 0;
+                const isTall = index % 4 === 0 || index % 5 === 0;
+                return (
+                  <div 
+                    key={`gallery-skeleton-${index}`}
+                    className="skeleton"
+                    style={{
+                      gridColumn: isWide ? 'span 2' : 'span 1',
+                      gridRow: isTall ? 'span 2' : 'span 1',
+                      border: '1px solid var(--border-light)',
+                      borderRadius: '0'
+                    }}
+                  />
+                );
+              })}
             </div>
           ) : galleries.length === 0 ? (
             <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
