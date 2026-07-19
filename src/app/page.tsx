@@ -14,6 +14,7 @@ export default function GalleriesHome() {
   const [newGalleryName, setNewGalleryName] = useState("");
   
   const [showGithubDropdown, setShowGithubDropdown] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   
   // Auth State
   const [user, setUser] = useState<User | null>(null);
@@ -110,28 +111,7 @@ export default function GalleriesHome() {
               </a>
             </div>
             
-            {/* Auth Toggle (Only Logout is in sidebar) */}
-            {!authLoading && user && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{user.displayName}</span>
-                <button 
-                  onClick={handleLogout} 
-                  style={{
-                    background: 'var(--accent)',
-                    border: '1px solid var(--accent)',
-                    color: 'var(--bg-primary)',
-                    fontSize: '0.75rem',
-                    padding: '0.25rem 0.75rem',
-                    cursor: 'pointer',
-                    borderRadius: '0',
-                    transition: 'all var(--transition-fast)',
-                  }}
-                >
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
+            {/* Auth Toggle removed from sidebar */}
 
           {/* Middle: Galleries List */}
           <div style={{ flex: 1, overflowY: 'auto', paddingRight: '1rem' }}>
@@ -258,49 +238,113 @@ export default function GalleriesHome() {
         {/* RIGHT SIDE: Dynamic Masonry Grid of Gallery Cards */}
         <main style={{ flex: 1, padding: '2vw', position: 'relative' }}>
           
-          {/* Dark Mode Toggle (Fixed Top Right) */}
-          <button 
-            onClick={toggleTheme} 
-            title="Toggle Theme"
-            style={{
-              position: 'fixed',
-              top: '2.5rem',
-              right: '2.5rem',
-              zIndex: 100,
-              background: 'transparent',
-              border: '1px solid var(--border-light)',
-              color: 'var(--text-primary)',
-              width: '45px',
-              height: '45px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              borderRadius: '0', 
-              transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-              transform: theme === 'dark' ? 'rotate(180deg)' : 'rotate(0deg)'
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--text-primary)'; e.currentTarget.style.transform = theme === 'dark' ? 'rotate(180deg) scale(1.05)' : 'rotate(0deg) scale(1.05)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-light)'; e.currentTarget.style.transform = theme === 'dark' ? 'rotate(180deg)' : 'rotate(0deg)'; }}
-          >
-            {theme === 'dark' ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-              </svg>
-            ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-              </svg>
+          {/* Top Right Controls (Profile + Dark Mode) */}
+          <div style={{ position: 'fixed', top: '2.5rem', right: '2.5rem', zIndex: 100, display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            
+            {/* Profile Dropdown */}
+            {user && (
+              <div style={{ position: 'relative' }}>
+                <button 
+                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid var(--border-light)',
+                    padding: '0.15rem',
+                    cursor: 'pointer',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    width: '45px',
+                    height: '45px',
+                    transition: 'border-color 0.3s'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--text-primary)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-light)'; }}
+                >
+                  <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}&background=random`} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                </button>
+
+                {showProfileDropdown && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 0.75rem)',
+                    right: 0,
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-light)',
+                    padding: '0.75rem',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.75rem',
+                    minWidth: '150px',
+                    borderRadius: '8px',
+                    zIndex: 200
+                  }}>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 500, padding: '0 0.25rem' }}>{user.displayName}</span>
+                    <hr style={{ border: 'none', borderTop: '1px solid var(--border-light)', margin: 0 }} />
+                    <button 
+                      onClick={() => { setShowProfileDropdown(false); handleLogout(); }}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-secondary)',
+                        fontSize: '0.8rem',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        padding: '0.25rem'
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--accent)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
-          </button>
+
+            {/* Dark Mode Toggle */}
+            <button 
+              onClick={toggleTheme} 
+              title="Toggle Theme"
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--border-light)',
+                color: 'var(--text-primary)',
+                width: '45px',
+                height: '45px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                borderRadius: '0', 
+                transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                transform: theme === 'dark' ? 'rotate(180deg)' : 'rotate(0deg)'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--text-primary)'; e.currentTarget.style.transform = theme === 'dark' ? 'rotate(180deg) scale(1.05)' : 'rotate(0deg) scale(1.05)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-light)'; e.currentTarget.style.transform = theme === 'dark' ? 'rotate(180deg)' : 'rotate(0deg)'; }}
+            >
+              {theme === 'dark' ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line>
+                  <line x1="21" y1="12" x2="23" y2="12"></line>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+              )}
+            </button>
+          </div>
 
           {!authLoading && !user ? (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '4rem', textAlign: 'center' }}>
