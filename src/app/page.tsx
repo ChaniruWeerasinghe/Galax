@@ -412,58 +412,51 @@ export default function GalleriesHome() {
                 return (
                   <div 
                     key={gallery.id} 
-                    className="masonry-item"
                     onClick={() => router.push(`/gallery/${gallery.id}`)}
                     style={{ 
                       gridColumn: isWide ? 'span 2' : 'span 1',
                       gridRow: isTall ? 'span 2' : 'span 1',
-                      position: 'relative'
-                    }}
-                  >
-                    <div style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      background: `linear-gradient(135deg, var(--border-light), var(--bg-secondary))`,
+                      position: 'relative',
+                      cursor: 'pointer',
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'var(--text-secondary)'
-                    }}>
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.3">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                        <polyline points="21 15 16 10 5 21"></polyline>
-                      </svg>
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      padding: '1.5rem',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-light)',
+                      transition: 'border-color var(--transition-fast)'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--text-primary)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-light)'; }}
+                  >
+                    <div>
+                      <h3 style={{ fontWeight: 400, fontSize: "1.25rem", letterSpacing: '-0.5px', color: 'var(--text-primary)', marginBottom: '0.25rem' }}>{gallery.name}</h3>
+                      <span style={{ fontWeight: 300, fontSize: "0.8rem", color: 'var(--text-secondary)' }}>{gallery.tabs.length} Events</span>
                     </div>
                     
-                    <div className="masonry-item-overlay" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 80%)', opacity: 1, color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: '2rem' }}>
-                      <span style={{ fontWeight: 500, fontSize: "1.5rem", letterSpacing: '-0.5px' }}>{gallery.name}</span>
-                      <span style={{ fontWeight: 300, fontSize: "0.85rem", opacity: 0.8, marginTop: '0.25rem' }}>{gallery.tabs.length} Events</span>
-                      
-                      {user && user.uid === gallery.userId && (
-                        <button 
-                          onClick={(e) => handleDeleteGallery(e, gallery.id)}
-                          style={{
-                            position: 'absolute',
-                            top: '1rem',
-                            right: '1rem',
-                            background: 'rgba(255,255,255,0.2)',
-                            backdropFilter: 'blur(4px)',
-                            border: 'none',
-                            color: 'white',
-                            cursor: 'pointer',
-                            fontSize: '0.75rem',
-                            padding: '0.25rem 0.5rem',
-                            transition: 'background var(--transition-fast)',
-                            pointerEvents: 'auto'
-                          }}
-                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.4)'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </div>
+                    {user && user.uid === gallery.userId && (
+                      <button 
+                        onClick={(e) => handleDeleteGallery(e, gallery.id)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--text-secondary)',
+                          cursor: 'pointer',
+                          fontSize: '0.75rem',
+                          padding: '0.25rem 0',
+                          transition: 'color var(--transition-fast)',
+                          pointerEvents: 'auto',
+                          alignSelf: 'flex-start',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          marginTop: '2rem'
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.color = '#e53935'; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                      >
+                        Delete Gallery
+                      </button>
+                    )}
                   </div>
                 );
               })}
