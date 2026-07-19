@@ -686,8 +686,8 @@ export default function GalleryPage() {
                       background: 'rgba(255,255,255,0.2)',
                       border: 'none',
                       borderRadius: '50%',
-                      width: '32px',
-                      height: '32px',
+                      width: '44px',
+                      height: '44px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -695,7 +695,8 @@ export default function GalleryPage() {
                       cursor: 'pointer',
                       backdropFilter: 'blur(4px)',
                       transition: 'background var(--transition-fast)',
-                      textDecoration: 'none'
+                      textDecoration: 'none',
+                      flexShrink: 0
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.4)'}
                     onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
