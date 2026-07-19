@@ -221,6 +221,7 @@ body {
 }
 
 .masonry-item {
+  break-inside: avoid;
   margin-bottom: 16px;
   overflow: hidden;
   position: relative;
