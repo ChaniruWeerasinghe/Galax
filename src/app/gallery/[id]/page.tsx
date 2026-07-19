@@ -29,7 +29,9 @@ export default function GalleryPage() {
   
   // Auth State
   const [user, setUser] = useState<User | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  
+  // Derived state for admin check to avoid stale closures and infinite effect loops
+  const isAdmin = user && gallery ? user.uid === gallery.userId : false;
   
   const [newTabName, setNewTabName] = useState("");
   const [error, setError] = useState("");
@@ -38,12 +40,6 @@ export default function GalleryPage() {
     // Listen to Firebase Auth
     const unsubscribeAuth = store.onAuthChange((currentUser) => {
       setUser(currentUser);
-      // Re-evaluate admin status if gallery is already loaded
-      if (gallery && currentUser) {
-        setIsAdmin(currentUser.uid === gallery.userId);
-      } else {
-        setIsAdmin(false);
-      }
     });
 
     const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
@@ -58,9 +54,6 @@ export default function GalleryPage() {
       }
       
       setGallery(data);
-      
-      // Check admin status immediately when gallery loads
-      setIsAdmin(user ? user.uid === data.userId : false);
       
       // If no active tab is set, or if the active tab was deleted, default to first tab
       if (data.tabs && data.tabs.length > 0) {
@@ -80,7 +73,7 @@ export default function GalleryPage() {
       unsubscribeAuth();
       unsubscribe();
     };
-  }, [galleryId, router, user, gallery]);
+  }, [galleryId, router]);
 
   const handleDriveSubmit = async (e: FormEvent) => {
     e.preventDefault();
