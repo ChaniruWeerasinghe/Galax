@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { store, Gallery, EventTab } from "@/lib/store";
 import { User } from "firebase/auth";
 import { downloadTabAsZip, downloadGalleryAsZip } from "@/lib/zipGenerator";
@@ -17,11 +17,16 @@ type GalleryMedia = {
 export default function GalleryPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const galleryId = params.id as string;
   
   const [gallery, setGallery] = useState<Gallery | null>(null);
   const [activeTab, setActiveTab] = useState<EventTab | null>(null);
   const [theme, setTheme] = useState("light");
+  
+  // Media Quality State
+  const [mediaQuality, setMediaQuality] = useState<"standard" | "high" | "original">("high");
+  const [showQualityMenu, setShowQualityMenu] = useState(false);
   
   // Google Drive State
   const [driveLink, setDriveLink] = useState("");
@@ -47,6 +52,20 @@ export default function GalleryPage() {
   // Lightbox State
   const [lightboxItem, setLightboxItem] = useState<GalleryMedia | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number>(0);
+
+  const getQualityUrl = (url: string, isLightbox = false) => {
+    if (!url) return url;
+    // Google Drive URLs often end with =s220 or =w...-h...
+    // standard: s800 (fast loading)
+    // high: s1600 (sharp)
+    // original: s0 (full resolution)
+    let sizeParam = "=s1600";
+    if (mediaQuality === "standard") sizeParam = "=s800";
+    if (mediaQuality === "original") sizeParam = "=s0";
+    if (isLightbox && mediaQuality === "standard") sizeParam = "=s1600"; // Lightbox should always be at least decent
+
+    return url.replace(/=s\d+|=w\d+-h\d+/, sizeParam);
+  };
 
   const openLightbox = (item: GalleryMedia, index: number) => {
     setLightboxItem(item);
@@ -101,10 +120,16 @@ export default function GalleryPage() {
       
       // If no active tab is set, or if the active tab was deleted, default to first tab
       if (data.tabs && data.tabs.length > 0) {
+        const urlTabId = searchParams.get("tab");
         setActiveTab((prev) => {
           if (!prev || !data.tabs.find(t => t.id === prev.id)) {
-            setDriveLink(data.tabs[0].driveLink || "");
-            return data.tabs[0];
+            let targetTab = data.tabs[0];
+            if (urlTabId) {
+              const found = data.tabs.find(t => t.id === urlTabId);
+              if (found) targetTab = found;
+            }
+            setDriveLink(targetTab.driveLink || "");
+            return targetTab;
           }
           return prev;
         });
@@ -117,7 +142,7 @@ export default function GalleryPage() {
       unsubscribeAuth();
       unsubscribe();
     };
-  }, [galleryId, router]);
+  }, [galleryId, router, searchParams]);
   const [newTabDriveLink, setNewTabDriveLink] = useState("");
 
   useEffect(() => {
@@ -280,6 +305,72 @@ export default function GalleryPage() {
               </svg>
             )}
           </button>
+          
+          {/* Quality Selector */}
+          {media.length > 0 && (
+            <div style={{ position: 'relative' }}>
+              <button 
+                onClick={() => setShowQualityMenu(!showQualityMenu)}
+                title="Media Quality"
+                style={{
+                  background: 'transparent',
+                  border: '1px solid var(--border-light)',
+                  color: 'var(--text-primary)',
+                  padding: '0.5rem 1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  borderRadius: '24px', 
+                  fontSize: '0.85rem',
+                  transition: 'all var(--transition-fast)'
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--text-primary)'; e.currentTarget.style.background = 'var(--text-primary)'; e.currentTarget.style.color = 'var(--bg-primary)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-light)'; e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+              >
+                <span>{mediaQuality === 'standard' ? 'Standard' : mediaQuality === 'high' ? 'High Quality' : 'Original'}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+              
+              {showQualityMenu && (
+                <div style={{ 
+                  position: 'absolute', 
+                  top: '100%', 
+                  right: 0, 
+                  marginTop: '0.5rem', 
+                  background: 'var(--bg-primary)', 
+                  border: '1px solid var(--border-light)', 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  minWidth: '160px', 
+                  zIndex: 20,
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                }}>
+                  <button 
+                    onClick={() => { setMediaQuality('standard'); setShowQualityMenu(false); }} 
+                    style={{ padding: '0.75rem 1rem', background: mediaQuality === 'standard' ? 'var(--bg-secondary)' : 'none', border: 'none', borderBottom: '1px solid var(--border-light)', textAlign: 'left', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: mediaQuality === 'standard' ? '500' : '300' }}
+                  >
+                    Standard (Fastest)
+                  </button>
+                  <button 
+                    onClick={() => { setMediaQuality('high'); setShowQualityMenu(false); }} 
+                    style={{ padding: '0.75rem 1rem', background: mediaQuality === 'high' ? 'var(--bg-secondary)' : 'none', border: 'none', borderBottom: '1px solid var(--border-light)', textAlign: 'left', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: mediaQuality === 'high' ? '500' : '300' }}
+                  >
+                    High Quality
+                  </button>
+                  <button 
+                    onClick={() => { setMediaQuality('original'); setShowQualityMenu(false); }} 
+                    style={{ padding: '0.75rem 1rem', background: mediaQuality === 'original' ? 'var(--bg-secondary)' : 'none', border: 'none', textAlign: 'left', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: mediaQuality === 'original' ? '500' : '300' }}
+                  >
+                    Original (Max Res)
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           {gallery.tabs.length > 0 && (
             <div style={{ position: 'relative' }}>
               <button 
@@ -544,9 +635,14 @@ export default function GalleryPage() {
                 {item.isVideo ? (
                   <div style={{ width: '100%', height: '100%', position: 'relative', background: '#111' }}>
                     {item.thumbnail ? (
-                      <img src={item.thumbnail} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }} referrerPolicy="no-referrer" />
+                      <img src={getQualityUrl(item.thumbnail)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }} referrerPolicy="no-referrer" />
                     ) : (
-                      <div style={{ width: '100%', height: '100%', background: '#1a1a1a' }} />
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                          <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                        </svg>
+                      </div>
                     )}
                     {/* Centered big play button */}
                     <div style={{
@@ -567,7 +663,7 @@ export default function GalleryPage() {
                   </div>
                 ) : (
                   <img 
-                    src={item.thumbnail || item.url} 
+                    src={item.thumbnail ? getQualityUrl(item.thumbnail) : item.url} 
                     alt={item.name || "Gallery media"} 
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                     loading="lazy"
@@ -621,8 +717,26 @@ export default function GalleryPage() {
                 <button 
                   className={`tab-btn ${activeTab?.id === tab.id ? "active" : ""}`}
                   onClick={() => handleTabSwitch(tab)}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                 >
                   <span>{tab.name}</span>
+                  {activeTab?.id === tab.id && (
+                    <span 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const url = new URL(window.location.href);
+                        url.searchParams.set("tab", tab.id);
+                        navigator.clipboard.writeText(url.toString());
+                        showToast("Tab link copied!");
+                      }}
+                      style={{ padding: '4px', display: 'flex', alignItems: 'center', borderRadius: '50%', background: 'rgba(0,0,0,0.15)', marginLeft: '4px' }}
+                      title="Share this tab"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line>
+                      </svg>
+                    </span>
+                  )}
                 </button>
               </div>
             ))}
@@ -647,20 +761,46 @@ export default function GalleryPage() {
             animation: 'fadeIn 0.2s ease-out'
           }}
         >
-          {/* Close button */}
-          <button
-            onClick={closeLightbox}
-            style={{
-              position: 'absolute', top: '1.5rem', right: '1.5rem',
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: '50%', width: '44px', height: '44px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'white', cursor: 'pointer', zIndex: 1
-            }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
+          {/* Top Right Controls (Share & Close) */}
+          <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', display: 'flex', gap: '0.75rem', zIndex: 1 }}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                // The URL for public sharing of a Google Drive file
+                navigator.clipboard.writeText(`https://drive.google.com/file/d/${lightboxItem.id}/view`);
+                showToast("File link copied!");
+              }}
+              style={{
+                background: 'rgba(255,255,255,0.1)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '50%', width: '44px', height: '44px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'white', cursor: 'pointer'
+              }}
+              title="Share File"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+            </button>
+            <button
+              onClick={closeLightbox}
+              style={{
+                background: 'rgba(255,255,255,0.1)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '50%', width: '44px', height: '44px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'white', cursor: 'pointer'
+              }}
+              title="Close"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
 
           {/* Prev button */}
           {media.length > 1 && (
