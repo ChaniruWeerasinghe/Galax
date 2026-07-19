@@ -133,6 +133,17 @@ export default function GalleryPage() {
     setMedia([]); 
   };
 
+  const handleDeleteTab = async (tabId: string) => {
+    if (confirm("Are you sure you want to delete this tab?")) {
+      await store.deleteTab(galleryId, tabId);
+      if (activeTab?.id === tabId) {
+        setActiveTab(null);
+        setDriveLink("");
+        setMedia([]);
+      }
+    }
+  };
+
   const downloadFile = (url: string, filename: string) => {
     const downloadUrl = url.replace('export=view', 'export=download');
     const iframe = document.createElement('iframe');
@@ -303,13 +314,33 @@ export default function GalleryPage() {
         <div className="floating-tabs-container">
           <div className="floating-tabs">
             {gallery.tabs.map((tab) => (
-              <button 
-                key={tab.id} 
-                className={`tab-btn ${activeTab?.id === tab.id ? "active" : ""}`}
-                onClick={() => handleTabSwitch(tab)}
-              >
-                {tab.name}
-              </button>
+              <div key={tab.id} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                <button 
+                  className={`tab-btn ${activeTab?.id === tab.id ? "active" : ""}`}
+                  onClick={() => handleTabSwitch(tab)}
+                  style={isAdmin ? { paddingRight: '0.5rem' } : undefined}
+                >
+                  {tab.name}
+                </button>
+                {isAdmin && (
+                  <button
+                    onClick={() => handleDeleteTab(tab.id)}
+                    style={{ 
+                      background: 'none', 
+                      border: 'none', 
+                      color: activeTab?.id === tab.id ? 'var(--bg-primary)' : 'var(--text-secondary)', 
+                      cursor: 'pointer', 
+                      padding: '0 0.75rem 0 0.25rem',
+                      marginRight: '0.25rem',
+                      fontSize: '1.2rem',
+                      lineHeight: 1
+                    }}
+                    title="Delete Tab"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
             ))}
             
             {/* Divider */}
