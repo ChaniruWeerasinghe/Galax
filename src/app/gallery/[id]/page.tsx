@@ -625,7 +625,7 @@ export default function GalleryPage() {
                 className="masonry-item" 
                 key={item.id}
                 onClick={(e) => {
-                  if ((e.target as Element).closest('button')) return;
+                  if ((e.target as Element).closest('button') || (e.target as Element).closest('a')) return;
                   openLightbox(item, index);
                 }}
                 style={{
@@ -677,12 +677,11 @@ export default function GalleryPage() {
               <div className="masonry-item-overlay">
                 <span style={{ fontWeight: 400, fontSize: "1.1rem", display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                   {item.name.replace(/\.[^/.]+$/, "")}
-                  <button 
-                    onClick={(e) => { 
-                      e.preventDefault();
-                      e.stopPropagation(); 
-                      downloadFile(item.id, item.name); 
-                    }}
+                  <a 
+                    href={`/api/proxy?url=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${item.id}`)}&filename=${encodeURIComponent(item.name)}`}
+                    download={item.name}
+                    onClick={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => e.stopPropagation()}
                     style={{
                       background: 'rgba(255,255,255,0.2)',
                       border: 'none',
@@ -695,7 +694,8 @@ export default function GalleryPage() {
                       color: 'white',
                       cursor: 'pointer',
                       backdropFilter: 'blur(4px)',
-                      transition: 'background var(--transition-fast)'
+                      transition: 'background var(--transition-fast)',
+                      textDecoration: 'none'
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.4)'}
                     onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
@@ -706,7 +706,7 @@ export default function GalleryPage() {
                       <polyline points="7 10 12 15 17 10"></polyline>
                       <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
-                  </button>
+                  </a>
                 </span>
               </div>
             </div>
