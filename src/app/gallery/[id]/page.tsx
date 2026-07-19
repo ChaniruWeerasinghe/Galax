@@ -315,70 +315,80 @@ export default function GalleryPage() {
         
         {error && <p style={{ color: '#e53935', marginBottom: '2rem' }}>{error}</p>}
 
-        <div className="masonry-grid">
-          {media.map((item) => (
-            <div className="masonry-item" key={item.id}>
-              {item.isVideo ? (
-                 <video src={item.url} muted loop playsInline autoPlay style={{ width: '100%', display: 'block' }} />
-              ) : (
-                <img src={item.thumbnail || item.url} alt={item.name || "Gallery media"} loading="lazy" />
-              )}
-              
-              <div className="masonry-item-overlay">
-                <span style={{ fontWeight: 400, fontSize: "1.1rem", display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                  {item.name.replace(/\.[^/.]+$/, "")}
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); downloadFile(item.url, item.name); }}
-                    style={{
-                      background: 'rgba(255,255,255,0.2)',
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: '32px',
-                      height: '32px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                      cursor: 'pointer',
-                      backdropFilter: 'blur(4px)',
-                      transition: 'background var(--transition-fast)'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.4)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
-                    title="Download"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                      <polyline points="7 10 12 15 17 10"></polyline>
-                      <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                  </button>
-                </span>
+        <div style={{ display: 'flex', gap: '16px', paddingBottom: '8rem', alignItems: 'flex-start' }}>
+          {Array.from({ length: 5 }, (_, colIndex) => {
+            // Distribute items into 5 columns evenly
+            const colItems = media.filter((_, i) => i % 5 === colIndex);
+            if (colItems.length === 0) return null;
+            
+            return (
+              <div key={colIndex} style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
+                {colItems.map((item) => (
+                  <div className="masonry-item" key={item.id}>
+                    {item.isVideo ? (
+                      <video src={item.url} muted loop playsInline autoPlay style={{ width: '100%', display: 'block' }} />
+                    ) : (
+                      <img src={item.thumbnail || item.url} alt={item.name || "Gallery media"} loading="lazy" />
+                    )}
+                    
+                    <div className="masonry-item-overlay">
+                      <span style={{ fontWeight: 400, fontSize: "1.1rem", display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                        {item.name.replace(/\.[^/.]+$/, "")}
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); downloadFile(item.url, item.name); }}
+                          style={{
+                            background: 'rgba(255,255,255,0.2)',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '32px',
+                            height: '32px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white',
+                            cursor: 'pointer',
+                            backdropFilter: 'blur(4px)',
+                            transition: 'background var(--transition-fast)'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.4)'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                          title="Download"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                          </svg>
+                        </button>
+                      </span>
+                    </div>
+                    
+                    {/* Premium Video Icon */}
+                    {item.isVideo && (
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '1rem',
+                        right: '1rem',
+                        background: 'rgba(0,0,0,0.5)',
+                        backdropFilter: 'blur(4px)',
+                        borderRadius: '50%',
+                        width: '32px',
+                        height: '32px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white'
+                      }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-              
-              {/* Premium Video Icon */}
-              {item.isVideo && (
-                <div style={{
-                  position: 'absolute',
-                  bottom: '1rem',
-                  right: '1rem',
-                  background: 'rgba(0,0,0,0.5)',
-                  backdropFilter: 'blur(4px)',
-                  borderRadius: '50%',
-                  width: '32px',
-                  height: '32px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white'
-                }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </main>
 

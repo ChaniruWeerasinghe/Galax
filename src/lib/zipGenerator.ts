@@ -7,7 +7,7 @@ interface MediaItem {
   name: string;
   url: string;
   thumbnail: string;
-  isVideo: boolean;
+  isVideo?: boolean;
 }
 
 // Helper to fetch file as Blob through our proxy
