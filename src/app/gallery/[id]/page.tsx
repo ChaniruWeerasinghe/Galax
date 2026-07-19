@@ -55,6 +55,12 @@ export default function GalleryPage() {
 
   const closeLightbox = () => setLightboxItem(null);
 
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    document.documentElement.setAttribute("data-theme", newTheme);
+  };
+
   const lightboxPrev = () => {
     const newIndex = (lightboxIndex - 1 + media.length) % media.length;
     setLightboxItem(media[newIndex]);
@@ -233,6 +239,45 @@ export default function GalleryPage() {
           <h1 className="gallery-title" style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '-1px' }}>{gallery.name}</h1>
         </div>
         <div className="gallery-nav-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {/* Dark Mode Toggle */}
+          <button 
+            onClick={toggleTheme} 
+            title="Toggle Theme"
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--border-light)',
+              color: 'var(--text-primary)',
+              width: '45px',
+              height: '45px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              borderRadius: '50%', 
+              transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+              transform: theme === 'dark' ? 'rotate(180deg)' : 'rotate(0deg)'
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--text-primary)'; e.currentTarget.style.transform = theme === 'dark' ? 'rotate(180deg) scale(1.05)' : 'rotate(0deg) scale(1.05)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-light)'; e.currentTarget.style.transform = theme === 'dark' ? 'rotate(180deg)' : 'rotate(0deg)'; }}
+          >
+            {theme === 'dark' ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            )}
+          </button>
           {gallery.tabs.length > 0 && (
             <div style={{ position: 'relative' }}>
               <button 
