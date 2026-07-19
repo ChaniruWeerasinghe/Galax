@@ -63,8 +63,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color var(--transition-slow), color var(--transition-slow);
-  overflow-x: hidden;
-  overflow-anchor: none;
   font-weight: 300;
 }
 
