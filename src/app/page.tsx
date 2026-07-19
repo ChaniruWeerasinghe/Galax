@@ -101,10 +101,10 @@ export default function GalleriesHome() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', minHeight: '100vh', opacity: showIntro ? 0 : 1, transition: "opacity var(--transition-slow)" }}>
+      <div className="home-layout" style={{ display: 'flex', minHeight: '100vh', opacity: showIntro ? 0 : 1, transition: "opacity var(--transition-slow)" }}>
         
         {/* LEFT SIDEBAR (Fixed) */}
-        <aside style={{
+        <aside className="home-sidebar" style={{
           width: '300px',
           height: '100vh',
           position: 'sticky',
@@ -116,7 +116,7 @@ export default function GalleriesHome() {
           background: 'var(--bg-primary)'
         }}>
           {/* Top: Logo & Theme Toggle */}
-          <div style={{ marginBottom: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+          <div className="home-sidebar-logo" style={{ marginBottom: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <div style={{ marginBottom: '1.5rem' }}>
               <a href="/" style={{ textDecoration: 'none', color: 'var(--text-primary)', display: 'block' }}>
                 <img src="/logo.png" alt="Galax Studios" style={{ height: '65px', width: 'auto', filter: theme === 'dark' ? 'invert(1)' : 'none', objectFit: 'contain' }} />
@@ -127,7 +127,7 @@ export default function GalleriesHome() {
           </div>
 
           {/* Middle: Galleries List */}
-          <div style={{ flex: 1, overflowY: 'auto', paddingRight: '1rem' }}>
+          <div className="home-sidebar-galleries" style={{ flex: 1, overflowY: 'auto', paddingRight: '1rem' }}>
 
             {/* Create Gallery Form (Logged in Only) */}
             {user && (
@@ -217,7 +217,7 @@ export default function GalleriesHome() {
           </div>
 
           {/* Bottom: Custom Footer Rules */}
-          <footer style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid var(--border-light)' }}>
+          <footer className="home-sidebar-footer" style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid var(--border-light)' }}>
             
             <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Developed by<br />Chaniru Weerasinghe
@@ -283,7 +283,7 @@ export default function GalleriesHome() {
         </aside>
 
         {/* RIGHT SIDE: Dynamic Masonry Grid of Gallery Cards */}
-        <main style={{ flex: 1, padding: '2vw', position: 'relative' }}>
+        <main className="home-main" style={{ flex: 1, padding: '2vw', position: 'relative' }}>
           
           {/* Top Right Controls (Dark Mode + Profile) */}
           <div style={{ position: 'fixed', top: '1.5rem', right: '1.5rem', zIndex: 100, display: 'flex', alignItems: 'center', gap: '1rem' }}>

@@ -204,7 +204,7 @@ export default function GalleryPage() {
 
   return (
     <>
-      <nav style={{ padding: '2rem 4vw', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <nav className="gallery-nav" style={{ padding: '2rem 4vw', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <button 
             onClick={() => router.push("/")} 
@@ -230,9 +230,9 @@ export default function GalleryPage() {
             </svg>
             Back to Galleries
           </button>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '-1px' }}>{gallery.name}</h1>
+          <h1 className="gallery-title" style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '-1px' }}>{gallery.name}</h1>
         </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div className="gallery-nav-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           {gallery.tabs.length > 0 && (
             <div style={{ position: 'relative' }}>
               <button 
@@ -321,7 +321,7 @@ export default function GalleryPage() {
         {isAdmin && (
           <div style={{ marginBottom: '3rem', background: 'var(--bg-secondary)', padding: '1.5rem', border: '1px solid var(--border-light)' }}>
             <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>Admin Controls (Hidden from Guests)</h3>
-            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+            <div className="admin-controls-panel" style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
               <div style={{ flex: '1 1 100%' }}>
                 <form onSubmit={handleAddTab} style={{ display: 'flex', gap: '0.5rem' }}>
                   <input 
@@ -437,7 +437,7 @@ export default function GalleryPage() {
           </div>
         )}
 
-        <div style={{ 
+        <div className="gallery-media-grid" style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
           gridAutoRows: '200px', 
@@ -599,6 +599,7 @@ export default function GalleryPage() {
           {media.length > 1 && (
             <button
               onClick={(e) => { e.stopPropagation(); lightboxPrev(); }}
+              className="lightbox-prev"
               style={{
                 position: 'absolute', left: '1.5rem', top: '50%', transform: 'translateY(-50%)',
                 background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
@@ -615,6 +616,7 @@ export default function GalleryPage() {
           {media.length > 1 && (
             <button
               onClick={(e) => { e.stopPropagation(); lightboxNext(); }}
+              className="lightbox-next"
               style={{
                 position: 'absolute', right: '1.5rem', top: '50%', transform: 'translateY(-50%)',
                 background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',

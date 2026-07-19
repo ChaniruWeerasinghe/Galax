@@ -302,7 +302,7 @@ body {
   font-weight: 400;
 }
 
-/* Responsive Masonry */
+/* ───────────── Responsive Masonry ───────────── */
 @media (max-width: 1400px) {
   .masonry-grid { column-count: 4; }
 }
@@ -323,4 +323,163 @@ body {
 @media (max-width: 480px) {
   .masonry-grid { column-count: 1; }
   .floating-tabs { width: 90vw; overflow-x: auto; justify-content: flex-start; }
+}
+
+/* ───────────── Mobile: Home Page Sidebar Layout ───────────── */
+@media (max-width: 768px) {
+
+  /* Convert fixed sidebar into a top header bar */
+  .home-layout {
+    flex-direction: column !important;
+  }
+
+  .home-sidebar {
+    width: 100% !important;
+    height: auto !important;
+    position: relative !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 1rem 1.25rem !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-light) !important;
+    overflow: visible !important;
+  }
+
+  .home-sidebar-logo {
+    margin-bottom: 0 !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    text-align: left !important;
+  }
+
+  .home-sidebar-logo img {
+    height: 40px !important;
+  }
+
+  .home-sidebar-galleries {
+    display: none !important; /* hidden on mobile — galleries visible in main grid */
+  }
+
+  .home-sidebar-footer {
+    display: none !important;
+  }
+
+  .home-main {
+    padding: 1rem !important;
+  }
+}
+
+/* ───────────── Mobile: Gallery Page Nav ───────────── */
+@media (max-width: 768px) {
+
+  .gallery-nav {
+    flex-wrap: wrap !important;
+    gap: 0.75rem !important;
+    padding: 1rem !important;
+  }
+
+  .gallery-title {
+    font-size: 1.6rem !important;
+    letter-spacing: -0.5px !important;
+  }
+
+  .gallery-nav-actions {
+    gap: 0.5rem !important;
+  }
+
+  /* Shrink download + share buttons */
+  .gallery-nav-actions button,
+  .gallery-nav-actions > div > button {
+    font-size: 0.78rem !important;
+    padding: 0.4rem 0.75rem !important;
+  }
+
+  /* Admin controls panel — stack vertically */
+  .admin-controls-panel {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    padding: 1rem !important;
+  }
+
+  .admin-controls-panel input {
+    width: 100% !important;
+  }
+
+  /* Media grid — 2 columns on mobile */
+  .gallery-media-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-rows: 150px !important;
+    gap: 6px !important;
+  }
+
+  /* Floating tab bar — scrollable pill row */
+  .floating-tabs-container {
+    bottom: 1rem !important;
+    width: 95vw !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .floating-tabs {
+    overflow-x: auto !important;
+    justify-content: flex-start !important;
+    padding: 0.25rem !important;
+    border-radius: 100px !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .tab-btn {
+    padding: 0.6rem 1rem !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Lightbox on mobile */
+  .lightbox-content {
+    max-width: 98vw !important;
+    max-height: 95vh !important;
+  }
+
+  .lightbox-prev,
+  .lightbox-next {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .lightbox-prev { left: 0.25rem !important; }
+  .lightbox-next { right: 0.25rem !important; }
+}
+
+@media (max-width: 480px) {
+  /* Single column grid on very small screens */
+  .gallery-media-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-rows: 130px !important;
+  }
+
+  .gallery-title {
+    font-size: 1.35rem !important;
+  }
+
+  /* Back button text shortens */
+  .back-btn-text {
+    display: none;
+  }
+}
+
+/* ───────────── Animations ───────────── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.text-shadow-sm {
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
