@@ -72,11 +72,18 @@ export default function GalleriesHome() {
     setNewGalleryName("");
   };
 
-  const handleDeleteGallery = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation(); 
-    if (confirm("Are you sure you want to delete this gallery?")) {
-      await store.deleteGallery(id);
+  const [galleryToDelete, setGalleryToDelete] = useState<string | null>(null);
+
+  const confirmDeleteGallery = async () => {
+    if (galleryToDelete) {
+      await store.deleteGallery(galleryToDelete);
+      setGalleryToDelete(null);
     }
+  };
+
+  const handleDeleteGallery = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); 
+    setGalleryToDelete(id);
   };
 
   return (
@@ -463,6 +470,32 @@ export default function GalleriesHome() {
           )}
         </main>
       </div>
+      
+      {/* Delete Confirmation Modal */}
+      {galleryToDelete && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: 'var(--bg-primary)', padding: '2rem', border: '1px solid var(--border-light)', maxWidth: '400px', width: '90%' }}>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', fontWeight: 400, color: 'var(--text-primary)' }}>Delete Gallery</h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.9rem', lineHeight: 1.5 }}>
+              Are you sure you want to permanently delete this gallery? This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+              <button 
+                onClick={() => setGalleryToDelete(null)}
+                style={{ padding: '0.5rem 1rem', background: 'transparent', border: '1px solid var(--border-light)', color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.85rem' }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDeleteGallery}
+                style={{ padding: '0.5rem 1rem', background: '#e53935', border: 'none', color: 'white', cursor: 'pointer', fontSize: '0.85rem' }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

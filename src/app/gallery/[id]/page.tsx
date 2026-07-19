@@ -4,6 +4,7 @@ import { useEffect, useState, FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { store, Gallery, EventTab } from "@/lib/store";
 import { User } from "firebase/auth";
+import { downloadTabAsZip, downloadGalleryAsZip } from "@/lib/zipGenerator";
 
 type GalleryMedia = {
   id: string;
@@ -26,6 +27,8 @@ export default function GalleryPage() {
   const [driveLink, setDriveLink] = useState("");
   const [media, setMedia] = useState<GalleryMedia[]>([]);
   const [isDriveLoading, setIsDriveLoading] = useState(false);
+  const [zipProgress, setZipProgress] = useState("");
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
   
   // Auth State
   const [user, setUser] = useState<User | null>(null);
@@ -153,12 +156,7 @@ export default function GalleryPage() {
     setTimeout(() => { document.body.removeChild(iframe); }, 5000);
   };
 
-  const handleDownloadAll = () => {
-    if (media.length === 0) return;
-    media.forEach((item, index) => {
-      setTimeout(() => { downloadFile(item.url, item.name); }, index * 800);
-    });
-  };
+  // handleDownloadAll has been removed in favor of ZIP downloading
 
   if (!gallery) return <div style={{ padding: '5rem', fontWeight: 300 }}>Loading Gallery...</div>;
 
@@ -171,16 +169,62 @@ export default function GalleryPage() {
           </button>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '-1px' }}>{gallery.name}</h1>
         </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {gallery.tabs.length > 0 && (
+            <div style={{ position: 'relative' }}>
+              <button 
+                onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+                style={{ 
+                  background: 'transparent', 
+                  color: 'var(--text-primary)', 
+                  border: '1px solid var(--border-light)', 
+                  padding: '0.5rem 1rem', 
+                  fontSize: '0.85rem', 
+                  cursor: 'pointer',
+                  borderRadius: '0'
+                }}
+              >
+                Download ↓
+              </button>
+              {showDownloadMenu && (
+                <div style={{ 
+                  position: 'absolute', 
+                  top: '100%', 
+                  right: 0, 
+                  marginTop: '0.5rem', 
+                  background: 'var(--bg-primary)', 
+                  border: '1px solid var(--border-light)', 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  minWidth: '220px', 
+                  zIndex: 10,
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                }}>
+                  <button 
+                    onClick={async () => { setShowDownloadMenu(false); if (activeTab) await downloadTabAsZip(activeTab, media, setZipProgress); }} 
+                    style={{ padding: '0.75rem 1rem', background: 'none', border: 'none', borderBottom: '1px solid var(--border-light)', textAlign: 'left', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '0.85rem' }}
+                  >
+                    Download Current Tab
+                  </button>
+                  <button 
+                    onClick={async () => { setShowDownloadMenu(false); await downloadGalleryAsZip(gallery, setZipProgress); }} 
+                    style={{ padding: '0.75rem 1rem', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '0.85rem' }}
+                  >
+                    Download Entire Gallery (.zip)
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
           <button 
             onClick={() => {
               navigator.clipboard.writeText(window.location.href);
               alert("Gallery link copied to clipboard! Share this URL with your clients.");
             }}
             style={{ 
-              background: 'transparent', 
-              color: 'var(--text-primary)', 
-              border: '1px solid var(--border-light)', 
+              background: 'var(--text-primary)', 
+              color: 'var(--bg-primary)', 
+              border: 'none', 
               padding: '0.5rem 1rem', 
               fontSize: '0.85rem', 
               cursor: 'pointer',
@@ -191,6 +235,13 @@ export default function GalleryPage() {
           </button>
         </div>
       </nav>
+
+      {zipProgress && (
+        <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', background: 'var(--text-primary)', color: 'var(--bg-primary)', padding: '1rem 2rem', zIndex: 1000, display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.9rem' }}>
+          <div className="loading-circle" style={{ width: '20px', height: '20px', borderColor: 'var(--bg-primary)', borderTopColor: 'transparent' }}></div>
+          {zipProgress}
+        </div>
+      )}
 
       <main style={{ padding: '0 4vw 6rem 4vw' }}>
         {isAdmin && (
@@ -344,26 +395,6 @@ export default function GalleryPage() {
             ))}
             
             {/* Divider */}
-            {media.length > 0 && (
-              <div style={{ width: '1px', background: 'var(--border-light)', margin: '0.25rem 0.5rem' }}></div>
-            )}
-            
-            {/* Download All Button */}
-            {media.length > 0 && (
-              <button 
-                className="tab-btn"
-                onClick={handleDownloadAll}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                title="Download all media in this tab"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                Download All
-              </button>
-            )}
           </div>
         </div>
       )}
