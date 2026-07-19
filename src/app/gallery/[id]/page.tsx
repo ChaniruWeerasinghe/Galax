@@ -353,7 +353,17 @@ export default function GalleryPage() {
                 {item.isVideo ? (
                   <video src={item.url} muted loop playsInline autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 ) : (
-                  <img src={item.thumbnail || item.url} alt={item.name || "Gallery media"} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img 
+                    src={item.thumbnail || item.url} 
+                    alt={item.name || "Gallery media"} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    loading="lazy"
+                    onError={(e) => {
+                      if (item.thumbnail && e.currentTarget.src !== item.url) {
+                        e.currentTarget.src = item.url;
+                      }
+                    }}
+                  />
                 )}
               
               <div className="masonry-item-overlay">
