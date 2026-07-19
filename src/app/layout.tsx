@@ -9,8 +9,17 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Galax - Shared Gallery",
-  description: "A premium shared gallery for events and trips",
+  title: "Galax.Studios",
+  description: "High-end photography gallery platform.",
+  openGraph: {
+    images: ['/og-image.png'],
+    title: "Galax.Studios",
+    description: "High-end photography gallery platform.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ['/og-image.png'],
+  }
 };
 
 export default function RootLayout({

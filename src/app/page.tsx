@@ -102,12 +102,12 @@ export default function GalleriesHome() {
         }}>
           {/* Top: Logo & Theme Toggle */}
           <div style={{ marginBottom: '3rem' }}>
-            <h1 style={{ fontSize: '1.2rem', fontWeight: 500, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
-              Galax.Studios
-            </h1>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '1.5rem' }}>
-              Portfolio
-            </p>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <a href="/" style={{ textDecoration: 'none', color: 'var(--text-primary)', display: 'block' }}>
+                <img src="/logo.png" alt="Galax Studios" style={{ height: '35px', filter: theme === 'dark' ? 'invert(1)' : 'none', objectFit: 'contain' }} />
+                <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', marginTop: '0.5rem', letterSpacing: '1px' }}>PORTFOLIO</p>
+              </a>
+            </div>
             
             <button 
               onClick={toggleTheme} 
