@@ -4,6 +4,8 @@ import { useEffect, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { store, Gallery } from "@/lib/store";
 import { User } from "firebase/auth";
+import { icons } from "lucide-react";
+import IconPicker from "@/components/IconPicker";
 
 export default function GalleriesHome() {
   const router = useRouter();
@@ -12,6 +14,8 @@ export default function GalleriesHome() {
   
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [newGalleryName, setNewGalleryName] = useState("");
+  const [newGalleryIcon, setNewGalleryIcon] = useState("Image");
+  const [showIconPicker, setShowIconPicker] = useState(false);
   
   const [showGithubDropdown, setShowGithubDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -68,8 +72,9 @@ export default function GalleriesHome() {
     e.preventDefault();
     if (!newGalleryName.trim() || !user) return;
     
-    await store.createGallery(user.uid, newGalleryName.trim());
+    await store.createGallery(user.uid, newGalleryName.trim(), newGalleryIcon);
     setNewGalleryName("");
+    setNewGalleryIcon("Image");
   };
 
   const [galleryToDelete, setGalleryToDelete] = useState<string | null>(null);
@@ -126,27 +131,61 @@ export default function GalleriesHome() {
 
             {/* Create Gallery Form (Logged in Only) */}
             {user && (
-              <form onSubmit={handleCreateGallery} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '2rem' }}>
-                <input 
-                  type="text" 
-                  placeholder="+ New Gallery" 
-                  value={newGalleryName}
-                  onChange={(e) => setNewGalleryName(e.target.value)}
-                  required
-                  style={{
-                    padding: '0.5rem 0',
-                    border: 'none',
-                    borderBottom: '1px solid var(--border-light)',
-                    background: 'transparent',
-                    color: 'var(--text-primary)',
-                    width: '100%',
-                    outline: 'none',
-                    fontFamily: 'inherit',
-                    fontWeight: 300,
-                    fontSize: '0.85rem'
-                  }}
-                />
-              </form>
+              <div style={{ marginBottom: '2rem' }}>
+                <form onSubmit={handleCreateGallery} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', borderBottom: '1px solid var(--border-light)', paddingBottom: '0.5rem' }}>
+                  
+                  {/* Icon Selector Button */}
+                  <button
+                    type="button"
+                    onClick={() => setShowIconPicker(true)}
+                    title="Choose Gallery Icon"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--text-secondary)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: 0,
+                      transition: 'color var(--transition-fast)'
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
+                    onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
+                  >
+                    {(() => {
+                      const IconComp = (icons as any)[newGalleryIcon] || icons.Image;
+                      return <IconComp size={20} strokeWidth={1.5} />;
+                    })()}
+                  </button>
+
+                  <input 
+                    type="text" 
+                    placeholder="+ New Gallery" 
+                    value={newGalleryName}
+                    onChange={(e) => setNewGalleryName(e.target.value)}
+                    required
+                    style={{
+                      flex: 1,
+                      border: 'none',
+                      background: 'transparent',
+                      color: 'var(--text-primary)',
+                      outline: 'none',
+                      fontFamily: 'inherit',
+                      fontWeight: 300,
+                      fontSize: '0.85rem'
+                    }}
+                  />
+                </form>
+
+                {showIconPicker && (
+                  <IconPicker 
+                    currentIcon={newGalleryIcon}
+                    onSelect={(icon) => { setNewGalleryIcon(icon); setShowIconPicker(false); }}
+                    onClose={() => setShowIconPicker(false)}
+                  />
+                )}
+              </div>
             )}
 
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -430,6 +469,15 @@ export default function GalleriesHome() {
                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-light)'; }}
                   >
                     <div>
+                      {(() => {
+                        const iconName = gallery.icon || "Image";
+                        const IconComp = (icons as any)[iconName] || icons.Image;
+                        return (
+                          <div style={{ marginBottom: '1rem', color: 'var(--text-primary)', opacity: 0.8 }}>
+                            <IconComp size={32} strokeWidth={1} />
+                          </div>
+                        );
+                      })()}
                       <h3 style={{ fontWeight: 400, fontSize: "1.25rem", letterSpacing: '-0.5px', color: 'var(--text-primary)', marginBottom: '0.25rem' }}>{gallery.name}</h3>
                       <span style={{ fontWeight: 300, fontSize: "0.8rem", color: 'var(--text-secondary)' }}>{gallery.tabs.length} Events</span>
                     </div>
