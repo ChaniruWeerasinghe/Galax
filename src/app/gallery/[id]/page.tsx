@@ -323,7 +323,7 @@ export default function GalleryPage() {
             <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>Admin Controls (Hidden from Guests)</h3>
             <div className="admin-controls-panel" style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
               <div style={{ flex: '1 1 100%' }}>
-                <form onSubmit={handleAddTab} style={{ display: 'flex', gap: '0.5rem' }}>
+                <form onSubmit={handleAddTab} className="admin-form" style={{ display: 'flex', gap: '0.5rem' }}>
                   <input 
                     type="text" 
                     placeholder="Tab Name (e.g. Weddings)" 

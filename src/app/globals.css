@@ -405,6 +405,22 @@ body {
     width: 100% !important;
   }
 
+  /* Admin form — stack inputs + button vertically */
+  .admin-form {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+
+  .admin-form input {
+    flex: unset !important;
+    width: 100% !important;
+  }
+
+  .admin-form button[type="submit"] {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
   /* Media grid — 2 columns on mobile */
   .gallery-media-grid {
     grid-template-columns: repeat(2, 1fr) !important;
