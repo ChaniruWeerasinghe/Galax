@@ -624,7 +624,10 @@ export default function GalleryPage() {
               <div 
                 className="masonry-item" 
                 key={item.id}
-                onClick={() => openLightbox(item, index)}
+                onClick={(e) => {
+                  if ((e.target as Element).closest('button')) return;
+                  openLightbox(item, index);
+                }}
                 style={{
                   gridColumn: `span ${colSpan}`,
                   gridRow: `span ${rowSpan}`,
@@ -675,7 +678,11 @@ export default function GalleryPage() {
                 <span style={{ fontWeight: 400, fontSize: "1.1rem", display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                   {item.name.replace(/\.[^/.]+$/, "")}
                   <button 
-                    onClick={(e) => { e.stopPropagation(); downloadFile(item.id, item.name); }}
+                    onClick={(e) => { 
+                      e.preventDefault();
+                      e.stopPropagation(); 
+                      downloadFile(item.id, item.name); 
+                    }}
                     style={{
                       background: 'rgba(255,255,255,0.2)',
                       border: 'none',
