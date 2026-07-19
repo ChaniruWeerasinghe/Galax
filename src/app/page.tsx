@@ -104,7 +104,7 @@ export default function GalleriesHome() {
           <div style={{ marginBottom: '3rem' }}>
             <div style={{ marginBottom: '1.5rem' }}>
               <a href="/" style={{ textDecoration: 'none', color: 'var(--text-primary)', display: 'block' }}>
-                <img src="/logo.png" alt="Galax Studios" style={{ height: '35px', filter: theme === 'dark' ? 'invert(1)' : 'none', objectFit: 'contain' }} />
+                <img src="/logo.png" alt="Galax Studios" style={{ height: '65px', width: 'auto', filter: theme === 'dark' ? 'invert(1)' : 'none', objectFit: 'contain' }} />
                 <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', marginTop: '0.5rem', letterSpacing: '1px' }}>PORTFOLIO</p>
               </a>
             </div>
