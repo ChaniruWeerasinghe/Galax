@@ -18,6 +18,14 @@ const fetchBlob = async (url: string): Promise<Blob> => {
   return await response.blob();
 };
 
+const chunkArray = <T,>(array: T[], size: number): T[][] => {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
+};
+
 export const downloadTabAsZip = async (
   tab: EventTab, 
   media: MediaItem[], 
@@ -31,17 +39,23 @@ export const downloadTabAsZip = async (
 
   let completed = 0;
   const total = media.length;
+  const CONCURRENCY = 5;
 
-  for (const item of media) {
-    try {
-      onProgress?.(`Fetching ${completed + 1}/${total}...`);
-      const downloadUrl = item.url.replace('export=view', 'export=download');
-      const blob = await fetchBlob(downloadUrl);
-      folder?.file(item.name, blob);
-      completed++;
-    } catch (e) {
-      console.error(`Failed to add ${item.name} to zip:`, e);
-    }
+  const chunks = chunkArray(media, CONCURRENCY);
+
+  for (const chunk of chunks) {
+    await Promise.all(chunk.map(async (item) => {
+      try {
+        const downloadUrl = item.url.replace('export=view', 'export=download');
+        const blob = await fetchBlob(downloadUrl);
+        folder?.file(item.name, blob);
+      } catch (e) {
+        console.error(`Failed to add ${item.name} to zip:`, e);
+      } finally {
+        completed++;
+        onProgress?.(`Fetching ${completed}/${total}...`);
+      }
+    }));
   }
 
   onProgress?.('Generating ZIP file (this may take a minute)...');
@@ -89,22 +103,28 @@ export const downloadGalleryAsZip = async (
     return;
   }
 
+  const CONCURRENCY = 5;
+
   // Now fetch every file and add to corresponding folder
   for (const { tab, media } of tabsWithMedia) {
     if (media.length === 0) continue;
     
     const folder = zip.folder(tab.name || 'Tab');
-    
-    for (const item of media) {
-      try {
-        onProgress?.(`Fetching ${completedFiles + 1}/${totalFiles}...`);
-        const downloadUrl = item.url.replace('export=view', 'export=download');
-        const blob = await fetchBlob(downloadUrl);
-        folder?.file(item.name, blob);
-        completedFiles++;
-      } catch (e) {
-        console.error(`Failed to add ${item.name} to zip:`, e);
-      }
+    const chunks = chunkArray(media, CONCURRENCY);
+
+    for (const chunk of chunks) {
+      await Promise.all(chunk.map(async (item) => {
+        try {
+          const downloadUrl = item.url.replace('export=view', 'export=download');
+          const blob = await fetchBlob(downloadUrl);
+          folder?.file(item.name, blob);
+        } catch (e) {
+          console.error(`Failed to add ${item.name} to zip:`, e);
+        } finally {
+          completedFiles++;
+          onProgress?.(`Fetching ${completedFiles}/${totalFiles}...`);
+        }
+      }));
     }
   }
 
@@ -112,6 +132,6 @@ export const downloadGalleryAsZip = async (
   const content = await zip.generateAsync({ type: 'blob' });
   
   onProgress?.('Downloading...');
-  saveAs(content, `${gallery.name.replace(/\\s+/g, '_')}_Full_Gallery.zip`);
+  saveAs(content, `${gallery.name.replace(/\s+/g, '_')}_Full_Gallery.zip`);
   onProgress?.(''); // Clear progress
 };
