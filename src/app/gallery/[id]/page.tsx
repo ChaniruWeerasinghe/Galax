@@ -314,6 +314,22 @@ export default function GalleryPage() {
         )}
         
         {error && <p style={{ color: '#e53935', marginBottom: '2rem' }}>{error}</p>}
+        
+        {/* Media Counts */}
+        {media.length > 0 && !isDriveLoading && (
+          <div style={{ 
+            marginBottom: '1rem', 
+            fontSize: '0.9rem', 
+            color: 'var(--text-secondary)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}>
+            <span>{media.filter(m => !m.isVideo).length} Images</span>
+            <span>•</span>
+            <span>{media.filter(m => m.isVideo).length} Videos</span>
+          </div>
+        )}
 
         <div style={{ 
           display: 'grid', 
