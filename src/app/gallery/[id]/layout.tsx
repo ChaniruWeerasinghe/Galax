@@ -27,14 +27,12 @@ export async function generateMetadata(
         openGraph: {
           title: title,
           description: description,
-          images: ['/og-image.png'],
           siteName: 'Galax Studios',
         },
         twitter: {
           card: 'summary_large_image',
           title: title,
           description: description,
-          images: ['/og-image.png'],
         }
       };
     }
