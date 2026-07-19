@@ -38,6 +38,16 @@ export default function GalleryPage() {
   
   const [newTabName, setNewTabName] = useState("");
   const [error, setError] = useState("");
+  
+  // Custom Overlays State
+  const [toastMessage, setToastMessage] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [tabToDelete, setTabToDelete] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(""), 4000);
+  };
 
   useEffect(() => {
     // Listen to Firebase Auth
