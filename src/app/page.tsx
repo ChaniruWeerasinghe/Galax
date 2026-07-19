@@ -454,7 +454,8 @@ export default function GalleriesHome() {
                             cursor: 'pointer',
                             fontSize: '0.75rem',
                             padding: '0.25rem 0.5rem',
-                            transition: 'background var(--transition-fast)'
+                            transition: 'background var(--transition-fast)',
+                            pointerEvents: 'auto'
                           }}
                           onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.4)'}
                           onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
