@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     const response = await drive.files.list({
       q: `'${folderId}' in parents and (mimeType contains 'image/' or mimeType contains 'video/') and trashed = false`,
       fields: 'files(id, name, webContentLink, thumbnailLink, mimeType)',
-      pageSize: 50,
+      pageSize: 1000,
     });
 
     const files = response.data.files || [];
