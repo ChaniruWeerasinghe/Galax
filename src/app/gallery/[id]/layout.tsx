@@ -3,14 +3,14 @@ import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
 type Props = {
-  params: { id: string }
+  params: Promise<{ id: string }>
 };
 
 export async function generateMetadata(
   { params }: Props
 ): Promise<Metadata> {
   // read route params
-  const id = params.id;
+  const { id } = await params;
   
   try {
     const docRef = doc(db, 'galleries', id);
