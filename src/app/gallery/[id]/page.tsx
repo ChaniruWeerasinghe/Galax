@@ -186,38 +186,14 @@ export default function GalleryPage() {
           <div style={{ marginBottom: '3rem', background: 'var(--bg-secondary)', padding: '1.5rem', border: '1px solid var(--border-light)' }}>
             <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>Admin Controls (Hidden from Guests)</h3>
             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-              <div style={{ flex: '1 1 400px' }}>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Update Current Tab ({activeTab?.name || 'All'})</p>
-                <form onSubmit={handleDriveSubmit} style={{ display: 'flex', gap: '0.5rem' }}>
-                  <input 
-                    type="url" 
-                    placeholder="Paste Google Drive Folder Link" 
-                    value={driveLink}
-                    onChange={(e) => setDriveLink(e.target.value)}
-                    style={{
-                      flex: 1,
-                      padding: '0.75rem',
-                      background: 'var(--bg-primary)',
-                      border: '1px solid var(--border-light)',
-                      color: 'var(--text-primary)',
-                      outline: 'none',
-                      fontSize: '0.85rem'
-                    }}
-                  />
-                  <button type="submit" disabled={isDriveLoading} style={{ padding: '0.75rem 1.5rem', background: 'var(--accent)', color: 'var(--bg-primary)', border: 'none', cursor: 'pointer', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
-                    {isDriveLoading ? 'Syncing...' : 'Sync Folder'}
-                  </button>
-                </form>
-              </div>
-              
-              <div style={{ flex: '1 1 500px' }}>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Create New Tab</p>
+              <div style={{ flex: '1 1 100%' }}>
                 <form onSubmit={handleAddTab} style={{ display: 'flex', gap: '0.5rem' }}>
                   <input 
                     type="text" 
-                    placeholder="Tab Name" 
+                    placeholder="Tab Name (e.g. Weddings)" 
                     value={newTabName}
                     onChange={(e) => setNewTabName(e.target.value)}
+                    required
                     style={{
                       flex: 1,
                       padding: '0.75rem',
@@ -230,11 +206,12 @@ export default function GalleryPage() {
                   />
                   <input 
                     type="url" 
-                    placeholder="Drive Link (Optional)" 
+                    placeholder="Paste Google Drive Folder Link" 
                     value={newTabDriveLink}
                     onChange={(e) => setNewTabDriveLink(e.target.value)}
+                    required
                     style={{
-                      flex: 1.5,
+                      flex: 2,
                       padding: '0.75rem',
                       background: 'var(--bg-primary)',
                       border: '1px solid var(--border-light)',
@@ -243,8 +220,8 @@ export default function GalleryPage() {
                       fontSize: '0.85rem'
                     }}
                   />
-                  <button type="submit" style={{ whiteSpace: 'nowrap', padding: '0.75rem 1.5rem', background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--border-light)', cursor: 'pointer', fontSize: '0.85rem' }}>
-                    + Create Tab
+                  <button type="submit" disabled={isDriveLoading} style={{ whiteSpace: 'nowrap', padding: '0.75rem 1.5rem', background: 'var(--text-primary)', color: 'var(--bg-primary)', border: 'none', cursor: 'pointer', fontSize: '0.85rem' }}>
+                    {isDriveLoading ? 'Syncing...' : '+ Create Tab & Sync'}
                   </button>
                 </form>
               </div>

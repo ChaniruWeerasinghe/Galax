@@ -69,9 +69,7 @@ export const store = {
       userId,
       name,
       createdAt: Date.now(),
-      tabs: [
-        { id: crypto.randomUUID(), name: "View All", driveLink: "" }
-      ]
+      tabs: []
     };
     await setDoc(doc(db, "galleries", newGallery.id), newGallery);
     return newGallery;
