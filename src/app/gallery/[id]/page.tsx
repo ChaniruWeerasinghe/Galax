@@ -186,13 +186,16 @@ export default function GalleryPage() {
     setTabToDelete(null);
   };
 
-  const downloadFile = (url: string, filename: string) => {
-    const downloadUrl = url.replace('export=view', 'export=download');
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = downloadUrl;
-    document.body.appendChild(iframe);
-    setTimeout(() => { document.body.removeChild(iframe); }, 5000);
+  const downloadFile = (fileId: string, filename: string) => {
+    // Route through proxy which sets Content-Disposition: attachment — forces browser to download not open
+    const driveDownloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+    const proxyUrl = `/api/proxy?url=${encodeURIComponent(driveDownloadUrl)}&filename=${encodeURIComponent(filename)}`;
+    const a = document.createElement('a');
+    a.href = proxyUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   // handleDownloadAll has been removed in favor of ZIP downloading
@@ -509,7 +512,7 @@ export default function GalleryPage() {
                 <span style={{ fontWeight: 400, fontSize: "1.1rem", display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                   {item.name.replace(/\.[^/.]+$/, "")}
                   <button 
-                    onClick={(e) => { e.stopPropagation(); downloadFile(item.url, item.name); }}
+                    onClick={(e) => { e.stopPropagation(); downloadFile(item.id, item.name); }}
                     style={{
                       background: 'rgba(255,255,255,0.2)',
                       border: 'none',

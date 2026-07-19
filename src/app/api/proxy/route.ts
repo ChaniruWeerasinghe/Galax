@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const url = searchParams.get('url');
+  const filename = searchParams.get('filename');
 
   if (!url) {
     return NextResponse.json({ error: 'Missing url parameter' }, { status: 400 });
@@ -28,6 +29,11 @@ export async function GET(request: Request) {
     if (contentLength) headers.set('Content-Length', contentLength);
     
     const arrayBuffer = await response.arrayBuffer();
+
+    // Add Content-Disposition if filename param provided — forces browser download
+    if (filename) {
+      headers.set('Content-Disposition', `attachment; filename="${decodeURIComponent(filename)}"`);
+    }
 
     return new NextResponse(arrayBuffer, {
       status: 200,
