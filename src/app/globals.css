@@ -221,15 +221,13 @@ body {
 }
 
 .masonry-item {
-  break-inside: avoid;
-  margin-bottom: 16px; /* Increased vertical gap */
+  margin-bottom: 16px;
   overflow: hidden;
   position: relative;
-  background-color: transparent; /* No white background peeking */
+  background-color: transparent;
   transition: transform var(--transition-slow);
   cursor: pointer;
-  border-radius: 0; /* Forced sharp corners */
-  min-height: 250px;
+  border-radius: 0;
 }
 
 .masonry-item img {
