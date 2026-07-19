@@ -347,7 +347,7 @@ export default function GalleryPage() {
         
         {error && <p style={{ color: '#e53935', marginBottom: '2rem' }}>{error}</p>}
         
-        {/* Media Counts */}
+        {/* Media Counts & Quick Actions */}
         {media.length > 0 && !isDriveLoading && (
           <div style={{ 
             marginBottom: '1rem', 
@@ -355,11 +355,43 @@ export default function GalleryPage() {
             color: 'var(--text-secondary)',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem'
+            justifyContent: 'space-between', // Push download button to the right
+            flexWrap: 'wrap',
+            gap: '1rem'
           }}>
-            <span>{media.filter(m => !m.isVideo).length} Images</span>
-            <span>•</span>
-            <span>{media.filter(m => m.isVideo).length} Videos</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span>{media.filter(m => !m.isVideo).length} Images</span>
+              <span>•</span>
+              <span>{media.filter(m => m.isVideo).length} Videos</span>
+            </div>
+            
+            {activeTab && (
+              <button 
+                onClick={async () => { if (activeTab) await downloadTabAsZip(activeTab, media, setZipProgress); }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '0.85rem',
+                  padding: '4px 8px',
+                  borderRadius: '12px',
+                  transition: 'all var(--transition-fast)'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.05)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download Tab
+              </button>
+            )}
           </div>
         )}
 
