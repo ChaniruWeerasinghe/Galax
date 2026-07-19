@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { store, Gallery, EventTab } from "@/lib/store";
 
 type GalleryMedia = {
@@ -14,6 +14,7 @@ type GalleryMedia = {
 
 export default function GalleryPage() {
   const params = useParams();
+  const router = useRouter();
   const galleryId = params.id as string;
   
   const [gallery, setGallery] = useState<Gallery | null>(null);
