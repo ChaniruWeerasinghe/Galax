@@ -44,6 +44,29 @@ export default function GalleryPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [tabToDelete, setTabToDelete] = useState<string | null>(null);
 
+  // Lightbox State
+  const [lightboxItem, setLightboxItem] = useState<GalleryMedia | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number>(0);
+
+  const openLightbox = (item: GalleryMedia, index: number) => {
+    setLightboxItem(item);
+    setLightboxIndex(index);
+  };
+
+  const closeLightbox = () => setLightboxItem(null);
+
+  const lightboxPrev = () => {
+    const newIndex = (lightboxIndex - 1 + media.length) % media.length;
+    setLightboxItem(media[newIndex]);
+    setLightboxIndex(newIndex);
+  };
+
+  const lightboxNext = () => {
+    const newIndex = (lightboxIndex + 1) % media.length;
+    setLightboxItem(media[newIndex]);
+    setLightboxIndex(newIndex);
+  };
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(""), 4000);
@@ -440,14 +463,38 @@ export default function GalleryPage() {
               <div 
                 className="masonry-item" 
                 key={item.id}
+                onClick={() => openLightbox(item, index)}
                 style={{
                   gridColumn: `span ${colSpan}`,
                   gridRow: `span ${rowSpan}`,
-                  margin: 0 // Override masonry-item margin
+                  margin: 0,
+                  cursor: 'pointer'
                 }}
               >
                 {item.isVideo ? (
-                  <video src={item.url} muted loop playsInline autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  <div style={{ width: '100%', height: '100%', position: 'relative', background: '#111' }}>
+                    {item.thumbnail ? (
+                      <img src={item.thumbnail} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }} referrerPolicy="no-referrer" />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', background: '#1a1a1a' }} />
+                    )}
+                    {/* Centered big play button */}
+                    <div style={{
+                      position: 'absolute', top: '50%', left: '50%',
+                      transform: 'translate(-50%,-50%)',
+                      background: 'rgba(255,255,255,0.15)',
+                      backdropFilter: 'blur(8px)',
+                      borderRadius: '50%',
+                      width: '52px', height: '52px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      border: '2px solid rgba(255,255,255,0.5)',
+                      color: 'white'
+                    }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                  </div>
                 ) : (
                   <img 
                     src={item.thumbnail || item.url} 
@@ -489,28 +536,6 @@ export default function GalleryPage() {
                   </button>
                 </span>
               </div>
-              
-              {/* Premium Video Icon */}
-              {item.isVideo && (
-                <div style={{
-                  position: 'absolute',
-                  bottom: '1rem',
-                  right: '1rem',
-                  background: 'rgba(0,0,0,0.5)',
-                  backdropFilter: 'blur(4px)',
-                  borderRadius: '50%',
-                  width: '32px',
-                  height: '32px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white'
-                }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              )}
             </div>
           );
         })}
@@ -533,6 +558,110 @@ export default function GalleryPage() {
             ))}
             
             {/* Divider */}
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox Overlay */}
+      {lightboxItem && (
+        <div
+          onClick={closeLightbox}
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.92)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 10000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            animation: 'fadeIn 0.2s ease-out'
+          }}
+        >
+          {/* Close button */}
+          <button
+            onClick={closeLightbox}
+            style={{
+              position: 'absolute', top: '1.5rem', right: '1.5rem',
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '50%', width: '44px', height: '44px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'white', cursor: 'pointer', zIndex: 1
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+
+          {/* Prev button */}
+          {media.length > 1 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); lightboxPrev(); }}
+              style={{
+                position: 'absolute', left: '1.5rem', top: '50%', transform: 'translateY(-50%)',
+                background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '50%', width: '48px', height: '48px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'white', cursor: 'pointer'
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+          )}
+
+          {/* Next button */}
+          {media.length > 1 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); lightboxNext(); }}
+              style={{
+                position: 'absolute', right: '1.5rem', top: '50%', transform: 'translateY(-50%)',
+                background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '50%', width: '48px', height: '48px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'white', cursor: 'pointer'
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          )}
+
+          {/* Content area */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '90vw', maxHeight: '90vh', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}
+          >
+            {lightboxItem.isVideo ? (
+              <iframe
+                key={lightboxItem.id}
+                src={`https://drive.google.com/file/d/${lightboxItem.id}/preview`}
+                allow="autoplay; fullscreen"
+                allowFullScreen
+                style={{
+                  width: 'min(85vw, 1100px)',
+                  height: 'min(75vh, 620px)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  background: '#000'
+                }}
+              />
+            ) : (
+              <img
+                key={lightboxItem.id}
+                src={lightboxItem.url || lightboxItem.thumbnail}
+                alt={lightboxItem.name}
+                referrerPolicy="no-referrer"
+                style={{
+                  maxWidth: 'min(88vw, 1200px)',
+                  maxHeight: '82vh',
+                  objectFit: 'contain',
+                  borderRadius: '6px',
+                  boxShadow: '0 24px 64px rgba(0,0,0,0.5)'
+                }}
+              />
+            )}
+            {/* Caption */}
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem', textAlign: 'center' }}>
+              {lightboxItem.name.replace(/\.[^/.]+$/, "")} &nbsp;·&nbsp; {lightboxIndex + 1} / {media.length}
+            </p>
           </div>
         </div>
       )}
