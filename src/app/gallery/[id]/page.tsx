@@ -210,7 +210,7 @@ export default function GalleryPage() {
                     fontSize: '0.85rem'
                   }}
                 />
-                <button type="submit" style={{ padding: '0.75rem 1.5rem', background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--border-light)', cursor: 'pointer', fontSize: '0.85rem' }}>
+                <button type="submit" style={{ whiteSpace: 'nowrap', padding: '0.75rem 1.5rem', background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--border-light)', cursor: 'pointer', fontSize: '0.85rem' }}>
                   + Add Tab
                 </button>
               </form>
