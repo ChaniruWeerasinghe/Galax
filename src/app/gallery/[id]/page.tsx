@@ -3,6 +3,7 @@
 import { useEffect, useState, FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { store, Gallery, EventTab } from "@/lib/store";
+import { User } from "firebase/auth";
 
 type GalleryMedia = {
   id: string;
@@ -25,13 +26,25 @@ export default function GalleryPage() {
   const [driveLink, setDriveLink] = useState("");
   const [media, setMedia] = useState<GalleryMedia[]>([]);
   const [isDriveLoading, setIsDriveLoading] = useState(false);
+  
+  // Auth State
+  const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  
   const [newTabName, setNewTabName] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Set auth state
-    setIsAdmin(store.isAdmin());
+    // Listen to Firebase Auth
+    const unsubscribeAuth = store.onAuthChange((currentUser) => {
+      setUser(currentUser);
+      // Re-evaluate admin status if gallery is already loaded
+      if (gallery && currentUser) {
+        setIsAdmin(currentUser.uid === gallery.userId);
+      } else {
+        setIsAdmin(false);
+      }
+    });
 
     const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
     setTheme(currentTheme);
@@ -45,6 +58,9 @@ export default function GalleryPage() {
       }
       
       setGallery(data);
+      
+      // Check admin status immediately when gallery loads
+      setIsAdmin(user ? user.uid === data.userId : false);
       
       // If no active tab is set, or if the active tab was deleted, default to first tab
       if (data.tabs && data.tabs.length > 0) {
@@ -61,9 +77,10 @@ export default function GalleryPage() {
     // Clean up cache and listener
     return () => {
       localStorage.removeItem("galax_drive_cache");
+      unsubscribeAuth();
       unsubscribe();
     };
-  }, [galleryId, router]);
+  }, [galleryId, router, user, gallery]);
 
   const handleDriveSubmit = async (e: FormEvent) => {
     e.preventDefault();

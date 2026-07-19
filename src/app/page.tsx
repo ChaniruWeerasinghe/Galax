@@ -3,6 +3,7 @@
 import { useEffect, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { store, Gallery } from "@/lib/store";
+import { User } from "firebase/auth";
 
 export default function GalleriesHome() {
   const router = useRouter();
@@ -15,47 +16,45 @@ export default function GalleriesHome() {
   const [showGithubDropdown, setShowGithubDropdown] = useState(false);
   
   // Auth State
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
-  const [pin, setPin] = useState("");
+  const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-    // Show intro screen
     const timer = setTimeout(() => setShowIntro(false), 1000);
-    
-    // Set theme
     const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
     setTheme(currentTheme);
     document.documentElement.setAttribute("data-theme", currentTheme);
 
-    // Load Auth State
-    setIsAdmin(store.isAdmin());
+    let unsubscribeGalleries: () => void;
 
-    // Subscribe to Firebase Galleries Real-time
-    const unsubscribe = store.subscribeToGalleries((data) => {
-      setGalleries(data);
+    // Listen to Firebase Auth
+    const unsubscribeAuth = store.onAuthChange((currentUser) => {
+      setUser(currentUser);
+      setAuthLoading(false);
+      
+      if (currentUser) {
+        // Subscribe to ONLY this user's galleries
+        unsubscribeGalleries = store.subscribeToGalleries(currentUser.uid, (data) => {
+          setGalleries(data);
+        });
+      } else {
+        setGalleries([]);
+      }
     });
 
     return () => {
       clearTimeout(timer);
-      unsubscribe();
+      unsubscribeAuth();
+      if (unsubscribeGalleries) unsubscribeGalleries();
     };
   }, []);
 
-  const handleLogin = (e: FormEvent) => {
-    e.preventDefault();
-    if (store.login(pin)) {
-      setIsAdmin(true);
-      setShowLogin(false);
-      setPin("");
-    } else {
-      alert("Incorrect PIN");
-    }
+  const handleLogin = async () => {
+    await store.login();
   };
 
-  const handleLogout = () => {
-    store.logout();
-    setIsAdmin(false);
+  const handleLogout = async () => {
+    await store.logout();
   };
 
   const toggleTheme = () => {
@@ -66,11 +65,9 @@ export default function GalleriesHome() {
 
   const handleCreateGallery = async (e: FormEvent) => {
     e.preventDefault();
-    if (!newGalleryName.trim()) return;
+    if (!newGalleryName.trim() || !user) return;
     
-    // UI will optimistically update via Firebase Snapshot
-    await store.createGallery(newGalleryName.trim());
-    
+    await store.createGallery(user.uid, newGalleryName.trim());
     setNewGalleryName("");
   };
 
@@ -131,53 +128,59 @@ export default function GalleriesHome() {
             </button>
             
             {/* Auth Toggle */}
-            <button 
-              onClick={() => isAdmin ? handleLogout() : setShowLogin(true)} 
-              style={{
-                background: 'transparent',
-                border: '1px solid var(--border-light)',
-                color: isAdmin ? 'var(--bg-primary)' : 'var(--text-secondary)',
-                backgroundColor: isAdmin ? 'var(--accent)' : 'transparent',
-                fontSize: '0.75rem',
-                padding: '0.25rem 0.75rem',
-                cursor: 'pointer',
-                borderRadius: '0',
-                transition: 'all var(--transition-fast)',
-                marginLeft: '0.5rem'
-              }}
-            >
-              {isAdmin ? "Logout" : "Admin"}
-            </button>
-            
-            {/* Login Prompt */}
-            {showLogin && !isAdmin && (
-              <form onSubmit={handleLogin} style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
-                <input 
-                  type="password" 
-                  placeholder="PIN" 
-                  value={pin}
-                  onChange={e => setPin(e.target.value)}
-                  autoFocus
+            {authLoading ? null : user ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginLeft: '0.5rem' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{user.displayName}</span>
+                <button 
+                  onClick={handleLogout} 
                   style={{
-                    padding: '0.25rem 0.5rem',
-                    border: '1px solid var(--border-light)',
-                    background: 'transparent',
-                    color: 'var(--text-primary)',
-                    width: '60px',
-                    outline: 'none',
-                    fontSize: '0.75rem'
+                    background: 'var(--accent)',
+                    border: '1px solid var(--accent)',
+                    color: 'var(--bg-primary)',
+                    fontSize: '0.75rem',
+                    padding: '0.25rem 0.75rem',
+                    cursor: 'pointer',
+                    borderRadius: '0',
+                    transition: 'all var(--transition-fast)',
                   }}
-                />
-                <button type="submit" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem', background: 'var(--accent)', color: 'var(--bg-primary)', border: 'none', cursor: 'pointer' }}>Unlock</button>
-                <button type="button" onClick={() => setShowLogin(false)} style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem', background: 'transparent', color: 'var(--text-secondary)', border: 'none', cursor: 'pointer' }}>Cancel</button>
-              </form>
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={handleLogin} 
+                style={{
+                  background: 'transparent',
+                  border: '1px solid var(--border-light)',
+                  color: 'var(--text-secondary)',
+                  fontSize: '0.75rem',
+                  padding: '0.25rem 0.75rem',
+                  cursor: 'pointer',
+                  borderRadius: '0',
+                  transition: 'all var(--transition-fast)',
+                  marginLeft: '0.5rem'
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.borderColor = 'var(--text-primary)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.borderColor = 'var(--border-light)'; }}
+              >
+                Sign in with Google
+              </button>
             )}
           </div>
 
           {/* Middle: Galleries List */}
           <div style={{ flex: 1, overflowY: 'auto' }}>
-            {/* Create Gallery Form (Admin Only) */}
-            {isAdmin && (
+            
+            {!authLoading && !user && (
+              <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--text-secondary)' }}>
+                <p style={{ fontSize: '1rem', fontWeight: 300, marginBottom: '1rem' }}>Create your first gallery to get started.</p>
+                <p style={{ fontSize: '0.85rem', opacity: 0.7 }}>Sign in above to host your portfolio.</p>
+              </div>
+            )}
+
+            {/* Create Gallery Form (Logged in Only) */}
+            {user && (
               <form onSubmit={handleCreateGallery} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '2rem' }}>
                 <input 
                   type="text" 
@@ -345,7 +348,7 @@ export default function GalleriesHome() {
                       <span style={{ fontWeight: 500, fontSize: "1.5rem", letterSpacing: '-0.5px' }}>{gallery.name}</span>
                       <span style={{ fontWeight: 300, fontSize: "0.85rem", opacity: 0.8, marginTop: '0.25rem' }}>{gallery.tabs.length} Events</span>
                       
-                      {isAdmin && (
+                      {user && user.uid === gallery.userId && (
                         <button 
                           onClick={(e) => handleDeleteGallery(e, gallery.id)}
                           style={{

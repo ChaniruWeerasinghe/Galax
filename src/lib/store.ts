@@ -1,5 +1,6 @@
-import { db } from "./firebase";
-import { collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, updateDoc } from "firebase/firestore";
+import { db, auth, googleProvider } from "./firebase";
+import { collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, updateDoc, query, where } from "firebase/firestore";
+import { signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/auth";
 
 export interface EventTab {
   id: string;
@@ -9,6 +10,7 @@ export interface EventTab {
 
 export interface Gallery {
   id: string;
+  userId: string; // NEW FIELD for Multi-Tenant Auth
   name: string; 
   coverImage?: string; 
   createdAt: number;
@@ -16,25 +18,28 @@ export interface Gallery {
 }
 
 export const store = {
-  // Auth Helpers (Local Storage PIN lock)
-  isAdmin: () => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem("galax_admin") === "true";
+  // Firebase Authentication
+  onAuthChange: (callback: (user: User | null) => void) => {
+    return onAuthStateChanged(auth, callback);
   },
-  login: (pin: string) => {
-    if (pin === "1234") {
-      localStorage.setItem("galax_admin", "true");
-      return true;
+  login: async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error("Login failed:", error);
     }
-    return false;
   },
-  logout: () => {
-    localStorage.removeItem("galax_admin");
+  logout: async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   },
 
-  // Firebase Realtime Subscriptions
-  subscribeToGalleries: (callback: (galleries: Gallery[]) => void) => {
-    const q = collection(db, "galleries");
+  // Firebase Realtime Subscriptions (Scoped to User)
+  subscribeToGalleries: (userId: string, callback: (galleries: Gallery[]) => void) => {
+    const q = query(collection(db, "galleries"), where("userId", "==", userId));
     return onSnapshot(q, (snapshot) => {
       const galleries: Gallery[] = [];
       snapshot.forEach((doc) => {
@@ -58,9 +63,10 @@ export const store = {
   },
 
   // Firebase Mutations
-  createGallery: async (name: string) => {
+  createGallery: async (userId: string, name: string) => {
     const newGallery: Gallery = {
       id: crypto.randomUUID(),
+      userId,
       name,
       createdAt: Date.now(),
       tabs: [
