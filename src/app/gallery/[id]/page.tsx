@@ -136,15 +136,21 @@ export default function GalleryPage() {
     setMedia([]); 
   };
 
-  const handleDeleteTab = async (tabId: string) => {
-    if (confirm("Are you sure you want to delete this tab?")) {
-      await store.deleteTab(galleryId, tabId);
-      if (activeTab?.id === tabId) {
-        setActiveTab(null);
-        setDriveLink("");
-        setMedia([]);
-      }
+  const confirmDeleteTab = (tabId: string) => {
+    setTabToDelete(tabId);
+    setShowDeleteConfirm(true);
+  };
+
+  const executeDeleteTab = async () => {
+    if (!tabToDelete) return;
+    await store.deleteTab(galleryId, tabToDelete);
+    if (activeTab?.id === tabToDelete) {
+      setActiveTab(null);
+      setDriveLink("");
+      setMedia([]);
     }
+    setShowDeleteConfirm(false);
+    setTabToDelete(null);
   };
 
   const downloadFile = (url: string, filename: string) => {
@@ -251,7 +257,7 @@ export default function GalleryPage() {
           <button 
             onClick={() => {
               navigator.clipboard.writeText(window.location.href);
-              alert("Gallery link copied to clipboard! Share this URL with your clients.");
+              showToast("Gallery link copied to clipboard!");
             }}
             style={{ 
               background: 'var(--text-primary)', 
@@ -324,7 +330,7 @@ export default function GalleryPage() {
               {activeTab && (
                 <div style={{ flex: '1 1 100%', display: 'flex', justifyContent: 'flex-end', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
                   <button 
-                    onClick={() => handleDeleteTab(activeTab.id)}
+                    onClick={() => confirmDeleteTab(activeTab.id)}
                     style={{
                       background: 'transparent',
                       border: '1px solid #e53935',
@@ -517,6 +523,91 @@ export default function GalleryPage() {
             ))}
             
             {/* Divider */}
+          </div>
+        </div>
+      )}
+
+      {/* Custom Toast Overlay */}
+      {toastMessage && (
+        <div style={{
+          position: 'fixed',
+          bottom: '2rem',
+          right: '2rem',
+          background: 'var(--text-primary)',
+          color: 'var(--bg-primary)',
+          padding: '1rem 1.5rem',
+          borderRadius: '8px',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          fontWeight: 400,
+          animation: 'slideUp 0.3s ease-out forwards',
+        }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          {toastMessage}
+        </div>
+      )}
+
+      {/* Custom Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-primary)',
+            padding: '2rem',
+            borderRadius: '12px',
+            maxWidth: '400px',
+            width: '90%',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+          }}>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>Delete Tab</h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', lineHeight: 1.5 }}>
+              Are you sure you want to permanently delete this tab? This will hide all images associated with it. This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button 
+                onClick={() => { setShowDeleteConfirm(false); setTabToDelete(null); }}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid var(--border-light)',
+                  color: 'var(--text-primary)',
+                  padding: '0.75rem 1.25rem',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 500
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={executeDeleteTab}
+                style={{
+                  background: '#e53935',
+                  border: 'none',
+                  color: 'white',
+                  padding: '0.75rem 1.25rem',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                  boxShadow: '0 4px 12px rgba(229, 57, 53, 0.3)'
+                }}
+              >
+                Delete Permanently
+              </button>
+            </div>
           </div>
         </div>
       )}
