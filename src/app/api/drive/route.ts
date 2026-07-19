@@ -39,12 +39,19 @@ export async function POST(req: NextRequest) {
     // Format the response for our frontend
     const media = files.map(file => {
       const isVideo = file.mimeType?.includes('video/');
+      
+      // Google Drive thumbnailLinks usually end with =s220 (small). We can change this to =s1000 for high quality.
+      let highResThumbnail = file.thumbnailLink;
+      if (highResThumbnail) {
+        highResThumbnail = highResThumbnail.replace(/=s\d+$/, '=s1000');
+      }
+
       return {
         id: file.id,
         name: file.name,
         // The direct view link for public google drive media
         url: `https://drive.google.com/uc?export=view&id=${file.id}`,
-        thumbnail: file.thumbnailLink,
+        thumbnail: highResThumbnail,
         isVideo,
         mimeType: file.mimeType
       };
