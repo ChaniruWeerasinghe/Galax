@@ -74,40 +74,60 @@ export default function GalleryPage() {
       unsubscribe();
     };
   }, [galleryId, router]);
+  const [newTabDriveLink, setNewTabDriveLink] = useState("");
+
+  useEffect(() => {
+    if (activeTab?.driveLink) {
+      let isMounted = true;
+      const fetchMedia = async () => {
+        setIsDriveLoading(true);
+        setError("");
+        try {
+          const res = await fetch("/api/drive", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ folderLink: activeTab.driveLink }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Failed to load media");
+          if (isMounted) setMedia(data.media);
+        } catch (err: any) {
+          if (isMounted) setError(err.message);
+        } finally {
+          if (isMounted) setIsDriveLoading(false);
+        }
+      };
+      fetchMedia();
+      return () => { isMounted = false; };
+    } else {
+      setMedia([]);
+    }
+  }, [activeTab?.id, activeTab?.driveLink]);
 
   const handleDriveSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!driveLink || !activeTab) return;
-
-    setIsDriveLoading(true);
+    // Updating the tab link will trigger Firebase onSnapshot, 
+    // which updates activeTab, which triggers the useEffect to fetch media!
     await store.updateTabLink(galleryId, activeTab.id, driveLink);
-    setError("");
-
-    try {
-      const res = await fetch("/api/drive", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folderLink: driveLink }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to load media");
-      setMedia(data.media);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsDriveLoading(false);
-    }
   };
 
   const handleAddTab = async (e: FormEvent) => {
     e.preventDefault();
     if (!newTabName) return;
-    await store.addTab(galleryId, newTabName);
+    
+    const newTab = await store.addTab(galleryId, newTabName, newTabDriveLink);
     setNewTabName("");
+    setNewTabDriveLink("");
+    
+    if (newTab) {
+      setActiveTab(newTab);
+      setDriveLink(newTab.driveLink || "");
+    }
   };
 
   const handleTabSwitch = (tab: EventTab) => {
+    if (activeTab?.id === tab.id) return;
     setActiveTab(tab);
     setDriveLink(tab.driveLink || "");
     setMedia([]); 
@@ -166,47 +186,68 @@ export default function GalleryPage() {
           <div style={{ marginBottom: '3rem', background: 'var(--bg-secondary)', padding: '1.5rem', border: '1px solid var(--border-light)' }}>
             <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>Admin Controls (Hidden from Guests)</h3>
             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-              <form onSubmit={handleDriveSubmit} style={{ flex: '1 1 300px', display: 'flex', gap: '0.5rem' }}>
-                <input 
-                  type="url" 
-                  placeholder="Paste Google Drive Folder Link" 
-                  value={driveLink}
-                  onChange={(e) => setDriveLink(e.target.value)}
-                  style={{
-                    flex: 1,
-                    padding: '0.75rem',
-                    background: 'var(--bg-primary)',
-                    border: '1px solid var(--border-light)',
-                    color: 'var(--text-primary)',
-                    outline: 'none',
-                    fontSize: '0.85rem'
-                  }}
-                />
-                <button type="submit" disabled={isDriveLoading} style={{ padding: '0.75rem 1.5rem', background: 'var(--accent)', color: 'var(--bg-primary)', border: 'none', cursor: 'pointer', fontSize: '0.85rem' }}>
-                  {isDriveLoading ? 'Syncing...' : 'Sync Folder'}
-                </button>
-              </form>
+              <div style={{ flex: '1 1 400px' }}>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Update Current Tab ({activeTab?.name || 'All'})</p>
+                <form onSubmit={handleDriveSubmit} style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input 
+                    type="url" 
+                    placeholder="Paste Google Drive Folder Link" 
+                    value={driveLink}
+                    onChange={(e) => setDriveLink(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '0.75rem',
+                      background: 'var(--bg-primary)',
+                      border: '1px solid var(--border-light)',
+                      color: 'var(--text-primary)',
+                      outline: 'none',
+                      fontSize: '0.85rem'
+                    }}
+                  />
+                  <button type="submit" disabled={isDriveLoading} style={{ padding: '0.75rem 1.5rem', background: 'var(--accent)', color: 'var(--bg-primary)', border: 'none', cursor: 'pointer', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
+                    {isDriveLoading ? 'Syncing...' : 'Sync Folder'}
+                  </button>
+                </form>
+              </div>
               
-              <form onSubmit={handleAddTab} style={{ flex: '0 1 300px', display: 'flex', gap: '0.5rem' }}>
-                <input 
-                  type="text" 
-                  placeholder="New Tab Name" 
-                  value={newTabName}
-                  onChange={(e) => setNewTabName(e.target.value)}
-                  style={{
-                    flex: 1,
-                    padding: '0.75rem',
-                    background: 'var(--bg-primary)',
-                    border: '1px solid var(--border-light)',
-                    color: 'var(--text-primary)',
-                    outline: 'none',
-                    fontSize: '0.85rem'
-                  }}
-                />
-                <button type="submit" style={{ whiteSpace: 'nowrap', padding: '0.75rem 1.5rem', background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--border-light)', cursor: 'pointer', fontSize: '0.85rem' }}>
-                  + Add Tab
-                </button>
-              </form>
+              <div style={{ flex: '1 1 500px' }}>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Create New Tab</p>
+                <form onSubmit={handleAddTab} style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input 
+                    type="text" 
+                    placeholder="Tab Name" 
+                    value={newTabName}
+                    onChange={(e) => setNewTabName(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '0.75rem',
+                      background: 'var(--bg-primary)',
+                      border: '1px solid var(--border-light)',
+                      color: 'var(--text-primary)',
+                      outline: 'none',
+                      fontSize: '0.85rem'
+                    }}
+                  />
+                  <input 
+                    type="url" 
+                    placeholder="Drive Link (Optional)" 
+                    value={newTabDriveLink}
+                    onChange={(e) => setNewTabDriveLink(e.target.value)}
+                    style={{
+                      flex: 1.5,
+                      padding: '0.75rem',
+                      background: 'var(--bg-primary)',
+                      border: '1px solid var(--border-light)',
+                      color: 'var(--text-primary)',
+                      outline: 'none',
+                      fontSize: '0.85rem'
+                    }}
+                  />
+                  <button type="submit" style={{ whiteSpace: 'nowrap', padding: '0.75rem 1.5rem', background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--border-light)', cursor: 'pointer', fontSize: '0.85rem' }}>
+                    + Create Tab
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
         )}

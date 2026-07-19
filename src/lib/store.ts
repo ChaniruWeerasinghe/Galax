@@ -70,9 +70,7 @@ export const store = {
       name,
       createdAt: Date.now(),
       tabs: [
-        { id: crypto.randomUUID(), name: "View All", driveLink: "" },
-        { id: crypto.randomUUID(), name: "Workshops", driveLink: "" },
-        { id: crypto.randomUUID(), name: "Trips", driveLink: "" }
+        { id: crypto.randomUUID(), name: "View All", driveLink: "" }
       ]
     };
     await setDoc(doc(db, "galleries", newGallery.id), newGallery);
@@ -95,7 +93,9 @@ export const store = {
       };
       gallery.tabs.push(newTab);
       await updateDoc(docRef, { tabs: gallery.tabs });
+      return newTab;
     }
+    return null;
   },
 
   updateTabLink: async (galleryId: string, tabId: string, driveLink: string) => {

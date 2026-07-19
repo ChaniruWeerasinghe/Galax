@@ -231,6 +231,7 @@ body {
   transition: transform var(--transition-slow);
   cursor: pointer;
   border-radius: 0; /* Forced sharp corners */
+  min-height: 250px;
 }
 
 .masonry-item img {
