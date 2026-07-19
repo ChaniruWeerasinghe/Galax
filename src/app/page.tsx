@@ -27,7 +27,8 @@ export default function GalleriesHome() {
 
   useEffect(() => {
     const timer = setTimeout(() => setShowIntro(false), 1000);
-    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+    const savedTheme = localStorage.getItem("galax_theme");
+    const currentTheme = savedTheme || document.documentElement.getAttribute("data-theme") || "light";
     setTheme(currentTheme);
     document.documentElement.setAttribute("data-theme", currentTheme);
 
@@ -70,6 +71,7 @@ export default function GalleriesHome() {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("galax_theme", newTheme);
   };
 
   const handleCreateGallery = async (e: FormEvent) => {

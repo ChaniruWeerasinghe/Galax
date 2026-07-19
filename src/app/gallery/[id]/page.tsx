@@ -59,6 +59,7 @@ export default function GalleryPage() {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("galax_theme", newTheme);
   };
 
   const lightboxPrev = () => {
@@ -84,7 +85,8 @@ export default function GalleryPage() {
       setUser(currentUser);
     });
 
-    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+    const savedTheme = localStorage.getItem("galax_theme");
+    const currentTheme = savedTheme || document.documentElement.getAttribute("data-theme") || "light";
     setTheme(currentTheme);
     document.documentElement.setAttribute("data-theme", currentTheme);
 
