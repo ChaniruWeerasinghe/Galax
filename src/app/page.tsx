@@ -112,6 +112,7 @@ export default function GalleriesHome() {
             </div>
             
             {/* Auth Toggle removed from sidebar */}
+          </div>
 
           {/* Middle: Galleries List */}
           <div style={{ flex: 1, overflowY: 'auto', paddingRight: '1rem' }}>
